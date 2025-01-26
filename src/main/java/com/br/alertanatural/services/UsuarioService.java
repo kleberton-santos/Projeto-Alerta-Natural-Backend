@@ -31,28 +31,8 @@ public class UsuarioService {
         }
     }
 
-    public List<LoginDTO> listarLoging() {
-        List<Usuarios> usuarios = usuarioRepository.findAll();
-
-        // Convertendo a lista de Usuários para uma lista de LoginDTO
-        return usuarios.stream()
-                .map(usuario -> new LoginDTO(usuario.getEmail(), null)) // Senha é null pois não deve ser exposta
-                .collect(Collectors.toList());
-    }
-
     public Usuarios criarUsuario(Usuarios usuarios){
         return usuarioRepository.save(usuarios);
-    }
-
-    public LoginDTO listarLoginPorId(Long id) {
-        Optional<Usuarios> usuarioOptional = usuarioRepository.findById(id);
-
-        if (usuarioOptional.isPresent()) {
-            Usuarios usuario = usuarioOptional.get();
-            return new LoginDTO(usuario.getEmail(), null); // Senha é null
-        } else {
-            throw new RuntimeException("Usuário não encontrado");
-        }
     }
 
     public List<Usuarios> listarUsuarios(){

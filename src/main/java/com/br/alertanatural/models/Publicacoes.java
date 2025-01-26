@@ -1,6 +1,9 @@
 package com.br.alertanatural.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 import java.util.List;
@@ -17,11 +20,15 @@ public class Publicacoes {
     @Column(columnDefinition = "TEXT")
     private String texto;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     private Date dataCadastro;
+
+    @UpdateTimestamp
+    private Date dataAtualizacao;
 
     @ManyToOne
     @JoinColumn(name = "idusuario", nullable = false)
+    @JsonIgnore
     private Usuarios usuario;
 
     @OneToMany(mappedBy = "publicacao", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -30,10 +37,11 @@ public class Publicacoes {
     public Publicacoes() {
     }
 
-    public Publicacoes(Long idPublicacao, String texto, Date dataCadastro, Usuarios usuario, List<Fotos> fotos) {
+    public Publicacoes(Long idPublicacao, String texto, Date dataCadastro,Date dataAtualizacao, Usuarios usuario, List<Fotos> fotos) {
         this.idPublicacao = idPublicacao;
         this.texto = texto;
         this.dataCadastro = dataCadastro;
+        this.dataAtualizacao = dataAtualizacao;
         this.usuario = usuario;
         this.fotos = fotos;
     }
@@ -62,6 +70,14 @@ public class Publicacoes {
         this.dataCadastro = dataCadastro;
     }
 
+    public Date getDataAtualizacao() {
+        return dataAtualizacao;
+    }
+
+    public void setDataAtualizacao(Date dataAtualizacao) {
+        this.dataAtualizacao = dataAtualizacao;
+    }
+
     public Usuarios getUsuario() {
         return usuario;
     }
@@ -80,10 +96,11 @@ public class Publicacoes {
 
     @Override
     public String toString() {
-        return "Publicacao{" +
+        return "Publicacoes{" +
                 "idPublicacao=" + idPublicacao +
                 ", texto='" + texto + '\'' +
                 ", dataCadastro=" + dataCadastro +
+                ", dataAtualizacao=" + dataAtualizacao +
                 ", usuario=" + usuario +
                 ", fotos=" + fotos +
                 '}';

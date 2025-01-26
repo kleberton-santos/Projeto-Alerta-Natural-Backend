@@ -18,32 +18,6 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    @PostMapping("/logins")
-    public ResponseEntity<String> criarLogin(@RequestBody LoginDTO loginDTO) {
-        try {
-            Usuarios usuario = usuarioService.criarLogin(loginDTO);
-            return ResponseEntity.ok("Login bem-sucedido! Bem-vindo, " + usuario.getNome());
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        }
-    }
-
-    @GetMapping("/listar-logins")
-    public ResponseEntity<List<LoginDTO>> listarLogins() {
-        List<LoginDTO> usuariosDTO = usuarioService.listarLoging();
-        return ResponseEntity.ok(usuariosDTO);
-    }
-
-    @GetMapping("/listar-logins/{id}")
-    public ResponseEntity<LoginDTO> listarLoginPorId(@PathVariable Long id) {
-        try {
-            LoginDTO usuarioDTO = usuarioService.listarLoginPorId(id);
-            return ResponseEntity.ok(usuarioDTO);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-    }
-
     @PostMapping
     public ResponseEntity<Usuarios> criarUsuario(@RequestBody Usuarios usuarios) {
         Usuarios usuarioCriado = usuarioService.criarUsuario(usuarios);

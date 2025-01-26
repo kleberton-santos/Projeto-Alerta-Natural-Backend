@@ -1,6 +1,8 @@
 package com.br.alertanatural.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
 import java.util.Objects;
@@ -15,15 +17,16 @@ public class Fotos {
 
     private String caminhoFoto;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     private Date dataCadastro;
 
     @ManyToOne
     @JoinColumn(name = "idUsuario", nullable = false)
+    @JsonIgnore
     private Usuarios usuario;
 
     @ManyToOne
-    @JoinColumn(name = "idPublicacao", nullable = true)  // Permite null para quando não houver publicação associada
+    @JoinColumn(name = "idPublicacao", nullable = true) // Relacionamento opcional com Publicacoes
     private Publicacoes publicacao;
 
 

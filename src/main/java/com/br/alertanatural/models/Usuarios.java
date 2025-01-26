@@ -2,6 +2,8 @@ package com.br.alertanatural.models;
 
 import jakarta.persistence.*;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 import java.util.List;
@@ -34,10 +36,10 @@ public class Usuarios {
 
     private String foto;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     private Date dataCadastro;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
     private Date dataAtualizacao;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
