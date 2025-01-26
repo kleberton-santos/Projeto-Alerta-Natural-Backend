@@ -51,6 +51,16 @@ public class UsuarioController {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Usuarios> editarUsuario(@PathVariable Long id, @RequestBody Usuarios usuarioAtualizado) {
+        try {
+            Usuarios usuarioEditado = usuarioService.editarUsuario(id, usuarioAtualizado);
+            return ResponseEntity.status(HttpStatus.OK).body(usuarioEditado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
 }
 
 

@@ -52,4 +52,47 @@ public class PublicacoesService {
         return publicacaoRepository.save(publicacao);
     }
 
+    public List<Publicacoes> listarPublicacoes() {
+        return publicacaoRepository.findAll();
+    }
+
+    public Publicacoes buscarPublicacaoPorId(Long id) {
+        return publicacaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Publicação não encontrada"));
+    }
+
+    public Publicacoes editarPublicacao(Long id, PublicacaoDTO publicacaoDTO) {
+        // Verifica se a publicação existe
+        Publicacoes publicacao = publicacaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Publicação não encontrada"));
+
+        // Atualiza o texto da publicação
+        publicacao.setTexto(publicacaoDTO.getTexto());
+
+        // Atualiza as fotos se existirem
+        if (publicacaoDTO.getFotos() != null) {
+            List<Fotos> fotos = new ArrayList<>();
+            for (String caminhoFoto : publicacaoDTO.getFotos()) {
+                Fotos foto = new Fotos();
+                foto.setCaminhoFoto(caminhoFoto);
+                foto.setUsuario(publicacao.getUsuario());
+                fotos.add(foto);
+            }
+            publicacao.setFotos(fotos);
+        }
+
+        // Salva a publicação editada
+        return publicacaoRepository.save(publicacao);
+    }
+
+    public void deletarPublicacao(Long id) {
+        Publicacoes publicacao = publicacaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Publicação não encontrada"));
+
+        // Deleta a publicação
+        publicacaoRepository.delete(publicacao);
+    }
+
+
+
 }
