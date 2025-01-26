@@ -1,6 +1,7 @@
 package com.br.alertanatural.models;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
 import java.util.Objects;
@@ -21,7 +22,7 @@ public class Amigos {
     @JoinColumn(name = "idAmigoUsuario", nullable = false)  // Renomeei para evitar conflito
     private Usuarios amigo;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
     private Date dataCadastro;
 
     public Amigos() {
