@@ -24,7 +24,7 @@ public class SecurityConfig {
 
                 // Novo método para configuração de autorização
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/auth/login", "/usuarios").permitAll()  // Permite acesso à rota de login
+                        .requestMatchers("/api/auth/login", "/usuarios", "/api/auth/refresh-token").permitAll()  // Permite acesso à rota de login
                         .anyRequest().authenticated()  // Outras rotas exigem autenticação
                 )
 

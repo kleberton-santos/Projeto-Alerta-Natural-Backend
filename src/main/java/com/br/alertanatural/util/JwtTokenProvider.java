@@ -11,22 +11,36 @@ public class JwtTokenProvider {
 
     private final String jwtSecret;
     private final long jwtExpiration;
+    private final long refreshTokenExpiration; // Definir um tempo de expiração maior para o Refresh Token
 
     @Autowired
     public JwtTokenProvider(JwtConfig jwtConfig) {
         this.jwtSecret = jwtConfig.getSecret();
         this.jwtExpiration = jwtConfig.getExpiration();
+        this.refreshTokenExpiration = jwtConfig.getRefreshTokenExpiration(); // A nova propriedade
     }
 
+    // Geração do Access Token
     public String generateToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration)) // Tempo mais curto
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
 
+    // Geração do Refresh Token
+    public String generateRefreshToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration)) // Tempo mais longo
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .compact();
+    }
+
+    // Recupera o email do token
     public String getEmailFromToken(String token) {
         JwtParser parser = Jwts.parserBuilder()
                 .setSigningKey(jwtSecret)
@@ -36,6 +50,7 @@ public class JwtTokenProvider {
                 .getSubject();
     }
 
+    // Valida o token
     public boolean validateToken(String token) {
         try {
             JwtParser parser = Jwts.parserBuilder()
@@ -48,6 +63,5 @@ public class JwtTokenProvider {
         }
     }
 }
-
 
 
