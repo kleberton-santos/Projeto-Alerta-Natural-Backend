@@ -1,19 +1,48 @@
 package com.br.alertanatural.DTOs;
 
+import java.util.Date;
 import java.util.List;
 
 public class FotosDTO {
 
-    private String texto;
+    private Long idFoto;
+    private String caminhoFoto;
+    private Date dataCadastro;
     private Long idUsuario;
-    private List<String> fotos;
+    private Long idPublicacao;
 
-    public String getTexto() {
-        return texto;
+    // Construtores, getters e setters
+
+    public FotosDTO(Long idFoto, String caminhoFoto, Date dataCadastro, Long idUsuario, Long idPublicacao) {
+        this.idFoto = idFoto;
+        this.caminhoFoto = caminhoFoto;
+        this.dataCadastro = dataCadastro;
+        this.idUsuario = idUsuario;
+        this.idPublicacao = idPublicacao;
     }
 
-    public void setTexto(String texto) {
-        this.texto = texto;
+    public Long getIdFoto() {
+        return idFoto;
+    }
+
+    public void setIdFoto(Long idFoto) {
+        this.idFoto = idFoto;
+    }
+
+    public String getCaminhoFoto() {
+        return caminhoFoto;
+    }
+
+    public void setCaminhoFoto(String caminhoFoto) {
+        this.caminhoFoto = caminhoFoto;
+    }
+
+    public Date getDataCadastro() {
+        return dataCadastro;
+    }
+
+    public void setDataCadastro(Date dataCadastro) {
+        this.dataCadastro = dataCadastro;
     }
 
     public Long getIdUsuario() {
@@ -24,11 +53,11 @@ public class FotosDTO {
         this.idUsuario = idUsuario;
     }
 
-    public List<String> getFotos() {
-        return fotos;
+    public Long getIdPublicacao() {
+        return idPublicacao;
     }
 
-    public void setFotos(List<String> fotos) {
-        this.fotos = fotos;
+    public void setIdPublicacao(Long idPublicacao) {
+        this.idPublicacao = idPublicacao;
     }
 }

@@ -1,5 +1,6 @@
 package com.br.alertanatural.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -8,6 +9,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "amigos")
+@JsonIgnoreProperties({"usuario", "amigo"})
 public class Amigos {
 
     @Id
