@@ -1,5 +1,6 @@
 package com.br.alertanatural.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -27,6 +28,7 @@ public class Fotos {
 
     @ManyToOne
     @JoinColumn(name = "idPublicacao", nullable = true) // Relacionamento opcional com Publicacoes
+    @JsonBackReference
     private Publicacoes publicacao;
 
 
