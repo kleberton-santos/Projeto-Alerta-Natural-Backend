@@ -4,6 +4,8 @@ import com.br.alertanatural.DTOs.AmigosDTO;
 import com.br.alertanatural.models.Amigos;
 import com.br.alertanatural.models.Usuarios;
 import com.br.alertanatural.services.AmigosService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,12 +15,14 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/amigos")
+@Tag(name = "Amigos", description = "Endpoints relacionados aos amigos")
 public class AmigosController {
 
     @Autowired
     private AmigosService amigosService;
 
     // Endpoint para adicionar um amigo
+    @Operation(summary = "Adicionar um novo amigo", description = "Adiciona um novo amigo entre dois usuários")
     @PostMapping("/adicionar")
     public ResponseEntity<AmigosDTO> adicionarAmigo(@RequestParam Long idUsuario, @RequestParam Long idAmigoUsuario) {
         Amigos amizade = amigosService.adicionarAmigo(idUsuario, idAmigoUsuario);
@@ -26,6 +30,7 @@ public class AmigosController {
         return ResponseEntity.ok(resposta);
     }
 
+    @Operation(summary = "Listar usuários que o usuário está seguindo", description = "Retorna uma lista dos usuários que o usuário está seguindo")
     @GetMapping("/seguindo/{idUsuario}")
     public ResponseEntity<List<AmigosDTO>> listarSeguindo(@PathVariable Long idUsuario) {
         List<AmigosDTO> seguindo = amigosService.listarSeguindo(idUsuario).stream()
@@ -35,6 +40,7 @@ public class AmigosController {
     }
 
     // Endpoint para listar os seguidores do usuário
+    @Operation(summary = "Listar seguidores de um usuário", description = "Retorna uma lista dos seguidores de um usuário")
     @GetMapping("/seguidores/{idUsuario}")
     public ResponseEntity<List<AmigosDTO>> listarSeguidores(@PathVariable Long idUsuario) {
         List<AmigosDTO> seguidores = amigosService.listarSeguidores(idUsuario).stream()
