@@ -18,17 +18,18 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // Nova forma de configurar CSRF, caso necessário
         http
                 .csrf(csrf -> csrf.disable())  // Desabilita CSRF, se necessário
-
-                // Novo método para configuração de autorização
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/auth/login", "/usuarios", "/api/auth/refresh-token").permitAll()  // Permite acesso à rota de login
-                        .anyRequest().authenticated()  // Outras rotas exigem autenticação
+                        // Libera o acesso para as URLs do Swagger
+                       .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        // Libera o acesso para o login e refresh token
+                        .requestMatchers("/api/auth/login", "/usuarios", "/api/auth/refresh-token").permitAll()
+                        // Exige autenticação para outras rotas
+                     //           .requestMatchers("/**").permitAll()
+                        .anyRequest().authenticated()
                 )
-
-                // Adicionando o filtro de autenticação JWT
+                // Adiciona o filtro de autenticação JWT
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

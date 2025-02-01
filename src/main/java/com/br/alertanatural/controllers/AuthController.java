@@ -5,6 +5,8 @@ import com.br.alertanatural.services.LoginService;
 import com.br.alertanatural.util.JwtResponse;
 import com.br.alertanatural.util.JwtTokenProvider;
 import com.br.alertanatural.util.RefreshTokenRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Autenticação", description = "Endpoints relacionados à autenticação")
 public class AuthController {
 
     @Autowired
@@ -23,6 +26,7 @@ public class AuthController {
     private JwtTokenProvider jwtTokenProvider;
 
     // Endpoint para login e geração de token
+    @Operation(summary = "Login de usuário", description = "Realiza o login do usuário e retorna os tokens de acesso e refresh")
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
         String email = loginDTO.getEmail();
@@ -45,6 +49,7 @@ public class AuthController {
     }
 
     // Endpoint para refresh token
+    @Operation(summary = "Refresh Token", description = "Gera um novo token de acesso utilizando o refresh token")
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
         String refreshToken = refreshTokenRequest.getRefreshToken();

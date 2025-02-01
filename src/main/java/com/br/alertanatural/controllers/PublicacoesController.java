@@ -5,6 +5,8 @@ import com.br.alertanatural.models.Fotos;
 import com.br.alertanatural.models.Publicacoes;
 import com.br.alertanatural.repositories.PublicacaoRepository;
 import com.br.alertanatural.services.PublicacoesService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,11 +17,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/publicacoes")
+@Tag(name = "Publicações", description = "Endpoints relacionados às publicações")
 public class PublicacoesController {
 
     @Autowired
     private PublicacoesService publicacoesService;
 
+    @Operation(summary = "Criar uma nova publicação", description = "Cria uma nova publicação com o texto fornecido")
     @PostMapping
     public ResponseEntity<Publicacoes> criarPublicacao(@RequestBody PublicacaoDTO publicacaoDTO) {
         try {
@@ -34,12 +38,14 @@ public class PublicacoesController {
         }
     }
 
+    @Operation(summary = "Listar todas as publicações", description = "Retorna todas as publicações disponíveis")
     @GetMapping
     public ResponseEntity<List<Publicacoes>> listarPublicacoes() {
         List<Publicacoes> publicacoes = publicacoesService.listarPublicacoes();
         return ResponseEntity.ok(publicacoes);
     }
 
+    @Operation(summary = "Buscar publicação por ID", description = "Retorna a publicação correspondente ao ID fornecido")
     @GetMapping("/{id}")
     public ResponseEntity<Publicacoes> buscarPublicacaoPorId(@PathVariable Long id) {
         try {
@@ -50,6 +56,7 @@ public class PublicacoesController {
         }
     }
 
+    @Operation(summary = "Editar publicação", description = "Edita a publicação existente com base no ID fornecido")
     @PutMapping("/{id}")
     public ResponseEntity<Publicacoes> editarPublicacao(@PathVariable Long id,
                                                         @RequestBody PublicacaoDTO publicacaoDTO) {
@@ -62,6 +69,7 @@ public class PublicacoesController {
     }
 
 
+    @Operation(summary = "Deletar publicação", description = "Deleta a publicação correspondente ao ID fornecido")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarPublicacao(@PathVariable Long id) {
         try {
