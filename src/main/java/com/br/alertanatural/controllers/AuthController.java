@@ -4,6 +4,7 @@ import com.br.alertanatural.DTOs.LoginDTO;
 import com.br.alertanatural.services.LoginService;
 import com.br.alertanatural.util.JwtResponse;
 import com.br.alertanatural.util.JwtTokenProvider;
+import com.br.alertanatural.util.RefreshTokenRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,13 +30,38 @@ public class AuthController {
 
         // Verifica se as credenciais estão corretas
         if (loginService.autenticar(email, senha)) {
-            // Gera o token JWT
-            String token = jwtTokenProvider.generateToken(email);
-            // Retorna o token no corpo da resposta
-            return ResponseEntity.ok(new JwtResponse(token));
+            // Gera o access token JWT
+            String accessToken = jwtTokenProvider.generateToken(email);
+
+            // Gera o refresh token
+            String refreshToken = jwtTokenProvider.generateRefreshToken(email);
+
+            // Retorna os tokens no corpo da resposta
+            return ResponseEntity.ok(new JwtResponse(accessToken, refreshToken));
         }
 
         // Retorna erro caso a autenticação falhe
         return ResponseEntity.status(401).body("Email ou senha inválidos");
+    }
+
+    // Endpoint para refresh token
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+        String refreshToken = refreshTokenRequest.getRefreshToken();
+
+        // Valida o refresh token
+        if (jwtTokenProvider.validateToken(refreshToken)) {
+            // Recupera o email associado ao refresh token
+            String email = jwtTokenProvider.getEmailFromToken(refreshToken);
+
+            // Gera um novo access token com o mesmo email
+            String newAccessToken = jwtTokenProvider.generateToken(email);
+
+            // Retorna o novo access token e o refresh token
+            return ResponseEntity.ok(new JwtResponse(newAccessToken, refreshToken));
+        }
+
+        // Retorna erro caso o refresh token seja inválido
+        return ResponseEntity.status(401).body("Refresh Token inválido");
     }
 }
