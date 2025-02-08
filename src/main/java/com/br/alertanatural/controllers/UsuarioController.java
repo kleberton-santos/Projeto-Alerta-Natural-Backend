@@ -3,6 +3,7 @@ package com.br.alertanatural.controllers;
 import com.br.alertanatural.DTOs.LoginDTO;
 import com.br.alertanatural.models.Usuarios;
 import com.br.alertanatural.services.UsuarioService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -10,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +41,7 @@ public class UsuarioController {
 
     @Operation(summary = "Buscar usuário por ID", description = "Retorna o usuário correspondente ao ID fornecido")
     @GetMapping("/{id}")
-    public ResponseEntity<Usuarios> listarUsuarios(@PathVariable Long id) {
+    public ResponseEntity<Usuarios> listarUsuariosId(@PathVariable Long id) {
         Optional<Usuarios> usuario = usuarioService.listarUsuariosPorId(id);
 
         if (usuario.isPresent()) {
@@ -61,14 +64,25 @@ public class UsuarioController {
 
     @Operation(summary = "Editar usuário", description = "Edita as informações do usuário baseado no ID fornecido")
     @PutMapping("/{idusuario}")
-    public ResponseEntity<Usuarios> editarUsuario(@PathVariable Long idusuario, @RequestBody @Valid Usuarios usuarioAtualizado) {
+    public ResponseEntity<Usuarios> editarUsuario(@PathVariable Long idusuario,
+                                                  @RequestParam("usuario") String usuarioJson,
+                                                  @RequestPart(value = "foto", required = false) MultipartFile foto) {
         try {
-            Usuarios usuarioEditado = usuarioService.editarUsuario(idusuario, usuarioAtualizado);
+            ObjectMapper objectMapper = new ObjectMapper();
+            Usuarios usuarioAtualizado = objectMapper.readValue(usuarioJson, Usuarios.class);
+
+            Usuarios usuarioEditado = usuarioService.editarUsuario(idusuario, usuarioAtualizado, foto);
             return ResponseEntity.status(HttpStatus.OK).body(usuarioEditado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Usuarios erro = new Usuarios();
+            erro.setNome("Erro ao editar usuário");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
         }
     }
+
+
+
 
 }
 

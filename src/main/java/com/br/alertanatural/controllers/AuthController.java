@@ -1,7 +1,9 @@
 package com.br.alertanatural.controllers;
 
 import com.br.alertanatural.DTOs.LoginDTO;
+import com.br.alertanatural.models.Usuarios;
 import com.br.alertanatural.services.LoginService;
+import com.br.alertanatural.services.UsuarioService;
 import com.br.alertanatural.util.JwtResponse;
 import com.br.alertanatural.util.JwtTokenProvider;
 import com.br.alertanatural.util.RefreshTokenRequest;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Autenticação", description = "Endpoints relacionados à autenticação")
@@ -24,6 +28,9 @@ public class AuthController {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     // Endpoint para login e geração de token
     @Operation(summary = "Login de usuário", description = "Realiza o login do usuário e retorna os tokens de acesso e refresh")
@@ -40,8 +47,13 @@ public class AuthController {
             // Gera o refresh token
             String refreshToken = jwtTokenProvider.generateRefreshToken(email);
 
-            // Retorna os tokens no corpo da resposta
-            return ResponseEntity.ok(new JwtResponse(accessToken, refreshToken));
+            // Recupera os dados do usuário para enviar junto com os tokens
+            Optional<Usuarios> usuario = usuarioService.listarUsuariosPorEmail(email);
+            if (usuario.isPresent()) {
+                Usuarios u = usuario.get();
+                JwtResponse response = new JwtResponse(accessToken, refreshToken, u.getIdusuario(), u.getNome(), u.getFoto());
+                return ResponseEntity.ok(response);
+            }
         }
 
         // Retorna erro caso a autenticação falhe
