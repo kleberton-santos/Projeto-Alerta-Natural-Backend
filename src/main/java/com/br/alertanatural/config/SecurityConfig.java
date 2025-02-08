@@ -24,7 +24,7 @@ public class SecurityConfig {
                         // Libera o acesso para as URLs do Swagger
                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         // Libera o acesso para o login e refresh token
-                        .requestMatchers("/api/auth/login", "/usuarios", "/api/auth/refresh-token").permitAll()
+                        .requestMatchers("/api/auth/login", "/usuarios", "/api/auth/refresh-token", "/**").permitAll()
                         // Exige autenticação para outras rotas
                      //           .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated()

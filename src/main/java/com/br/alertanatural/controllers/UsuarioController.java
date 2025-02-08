@@ -5,6 +5,7 @@ import com.br.alertanatural.models.Usuarios;
 import com.br.alertanatural.services.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,10 +60,10 @@ public class UsuarioController {
     }
 
     @Operation(summary = "Editar usuário", description = "Edita as informações do usuário baseado no ID fornecido")
-    @PutMapping("/{id}")
-    public ResponseEntity<Usuarios> editarUsuario(@PathVariable Long id, @RequestBody Usuarios usuarioAtualizado) {
+    @PutMapping("/{idusuario}")
+    public ResponseEntity<Usuarios> editarUsuario(@PathVariable Long idusuario, @RequestBody @Valid Usuarios usuarioAtualizado) {
         try {
-            Usuarios usuarioEditado = usuarioService.editarUsuario(id, usuarioAtualizado);
+            Usuarios usuarioEditado = usuarioService.editarUsuario(idusuario, usuarioAtualizado);
             return ResponseEntity.status(HttpStatus.OK).body(usuarioEditado);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
