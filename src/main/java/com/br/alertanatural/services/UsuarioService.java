@@ -38,11 +38,25 @@ public class UsuarioService {
     public Usuarios editarUsuario(Long id, Usuarios usuarioAtualizado) {
         return usuarioRepository.findById(id)
                 .map(usuario -> {
+                    usuario.setNome(usuarioAtualizado.getNome());
+                    usuario.setSobreNome(usuarioAtualizado.getSobreNome());
+                    usuario.setCpf(usuarioAtualizado.getCpf());
+                    usuario.setTelefone(usuarioAtualizado.getTelefone());
                     usuario.setEmail(usuarioAtualizado.getEmail());
-                    usuario.setSenha(passwordEncoder.encode(usuarioAtualizado.getSenha())); // Recriptografar senha ao editar
+
+                    // Verifique se a senha foi passada no corpo da requisição
+                    if (usuarioAtualizado.getSenha() != null) {
+                        usuario.setSenha(passwordEncoder.encode(usuarioAtualizado.getSenha())); // Recriptografar senha
+                    }
+
+                    // Outros campos podem ser atualizados da mesma forma
+                    usuario.setFoto(usuarioAtualizado.getFoto());
+
                     return usuarioRepository.save(usuario);
-                }).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                })
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
+
 
     public void deletarUsuario(Long id){
          usuarioRepository.deleteById(id);
