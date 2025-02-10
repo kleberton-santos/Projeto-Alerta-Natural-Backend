@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,8 +27,14 @@ public class UsuarioService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private static final String UPLOAD_DIR = "C:\\Users\\Kleber\\Desktop\\Projeto - Desastres\\FotosPerfil"; // Defina o diretório onde as imagens serão armazenadas
+    private static final String UPLOAD_DIR = "C:\\foto-alerta";
 
+    static {
+        File diretorio = new File(UPLOAD_DIR);
+        if (!diretorio.exists()) {
+            diretorio.mkdirs();
+        }
+    }
 
     public Usuarios criarUsuario(Usuarios usuario) {
         // Criptografar a senha antes de salvar no banco
