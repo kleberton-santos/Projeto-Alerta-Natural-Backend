@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Date;
 import java.util.List;
@@ -50,6 +51,15 @@ public class UsuarioService {
         return usuarioRepository.findById(id);
     }
 
+
+    public void deletarUsuario(Long id){
+         usuarioRepository.deleteById(id);
+    }
+
+    public Optional<Usuarios> listarUsuariosPorEmail(String email) {
+        return usuarioRepository.findByEmail(email);
+    }
+
     public Usuarios editarUsuario(Long id, Usuarios usuarioAtualizado, MultipartFile foto) throws IOException {
         return usuarioRepository.findById(id)
                 .map(usuario -> {
@@ -80,26 +90,18 @@ public class UsuarioService {
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
 
-
-    public void deletarUsuario(Long id){
-         usuarioRepository.deleteById(id);
-    }
-
-    public Optional<Usuarios> listarUsuariosPorEmail(String email) {
-        return usuarioRepository.findByEmail(email);
-    }
-
-    public String salvarFoto(MultipartFile foto) throws IOException {
+    private String salvarFoto(MultipartFile foto) throws IOException {
         // Geração de nome único para a foto
         String nomeArquivo = System.currentTimeMillis() + "_" + foto.getOriginalFilename();
-        Path caminhoDestino = Path.of(UPLOAD_DIR, nomeArquivo);
+        Path caminhoDestino = Paths.get(UPLOAD_DIR, nomeArquivo);
 
         // Salva o arquivo no diretório especificado
-        Files.copy(foto.getInputStream(), caminhoDestino, StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(foto.getInputStream(), caminhoDestino);
 
         // Retorna o caminho da foto salva
         return nomeArquivo;
     }
+
 }
 
 

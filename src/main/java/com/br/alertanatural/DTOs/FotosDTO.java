@@ -11,6 +11,9 @@ public class FotosDTO {
     private Long idUsuario;
     private Long idPublicacao;
 
+    public FotosDTO() {
+    }
+
     // Construtores, getters e setters
 
     public FotosDTO(Long idFoto, String caminhoFoto, Date dataCadastro, Long idUsuario, Long idPublicacao) {

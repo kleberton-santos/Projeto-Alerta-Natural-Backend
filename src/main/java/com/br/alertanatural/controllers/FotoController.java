@@ -1,7 +1,6 @@
 package com.br.alertanatural.controllers;
 
 import com.br.alertanatural.DTOs.FotosDTO;
-import com.br.alertanatural.models.Fotos;
 import com.br.alertanatural.services.FotoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
