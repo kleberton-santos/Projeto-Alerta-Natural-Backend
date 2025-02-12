@@ -10,7 +10,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/foto/**")
-                .addResourceLocations("file:/C:/foto-alerta/");  // Caminho da pasta onde as fotos estão armazenadas
+        registry.addResourceHandler("/fotos/**")
+                .addResourceLocations("file:/C:/foto-alerta/");  // Remove 'file:///' do caminho
     }
 }

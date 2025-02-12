@@ -10,6 +10,7 @@ import com.br.alertanatural.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,8 +43,9 @@ public class FotoService {
         // Cria e configura a entidade Fotos
         Fotos foto = new Fotos();
         foto.setCaminhoFoto(fotoDTO.getCaminhoFoto());
-        foto.setUsuario(usuario);
-        foto.setPublicacao(publicacao);
+        foto.setDataCadastro(new Date()); // Define a data de cadastro como Date
+        foto.setUsuario(usuario); // Associa ao usuário
+        foto.setPublicacao(publicacao); // Associa à publicação, se existir
 
         // Salva a foto no banco
         Fotos fotoSalva = fotoRepository.save(foto);
@@ -57,7 +59,6 @@ public class FotoService {
                 fotoSalva.getPublicacao() != null ? fotoSalva.getPublicacao().getIdPublicacao() : null
         );
     }
-
     public List<FotosDTO> listarFotosPorUsuario(Long idusuario) {
         List<Fotos> fotos = fotoRepository.findByUsuario_Idusuario(idusuario); // Assume que você tem esse método no repositório
         return fotos.stream().map(foto -> new FotosDTO(

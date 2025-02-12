@@ -1,7 +1,9 @@
 package com.br.alertanatural.controllers;
 
+import com.br.alertanatural.DTOs.FotosDTO;
 import com.br.alertanatural.DTOs.LoginDTO;
 import com.br.alertanatural.models.Usuarios;
+import com.br.alertanatural.services.FotoService;
 import com.br.alertanatural.services.UsuarioService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +26,9 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private FotoService fotoService;
 
     @Operation(summary = "Criar novo usuário", description = "Cria um novo usuário com os dados fornecidos")
     @PostMapping
@@ -72,6 +77,15 @@ public class UsuarioController {
             Usuarios usuarioAtualizado = objectMapper.readValue(usuarioJson, Usuarios.class);
 
             Usuarios usuarioEditado = usuarioService.editarUsuario(idusuario, usuarioAtualizado, foto);
+
+            // Se uma foto foi enviada, salva na tabela de fotos
+            if (foto != null && !foto.isEmpty()) {
+                FotosDTO fotoDTO = new FotosDTO();
+                fotoDTO.setCaminhoFoto(usuarioEditado.getFoto());
+                fotoDTO.setIdUsuario(usuarioEditado.getIdusuario());
+                fotoService.salvarFoto(fotoDTO);
+            }
+
             return ResponseEntity.status(HttpStatus.OK).body(usuarioEditado);
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,11 +94,10 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
         }
     }
-
-
-
-
 }
+
+
+
 
 
 
