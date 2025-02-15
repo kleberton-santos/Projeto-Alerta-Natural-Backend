@@ -8,13 +8,24 @@ import com.br.alertanatural.repositories.FotoRepository;
 import com.br.alertanatural.repositories.PublicacaoRepository;
 import com.br.alertanatural.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class PublicacoesService {
+
+    @Value("${diretorio.fotos}") // Configura o diretório no application.properties
+    private String diretorioFotos;
 
     @Autowired
     private PublicacaoRepository publicacaoRepository;
@@ -25,74 +36,148 @@ public class PublicacoesService {
     @Autowired
     private FotoRepository fotoRepository;
 
+    // Método para expor o diretório de fotos
+    public String getDiretorioFotos() {
+        return diretorioFotos;
+    }
+
+
+
+    // Cria uma nova publicação
     public Publicacoes criarPublicacao(PublicacaoDTO publicacaoDTO) {
-        // Buscar o usuário pelo ID
+        Publicacoes publicacao = new Publicacoes();
+
+        // Busca o usuário pelo ID e associa à publicação
         Usuarios usuario = usuarioRepository.findById(publicacaoDTO.getIdUsuario())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        publicacao.setUsuario(usuario);
 
-        // Criar a publicação e associar o usuário
-        Publicacoes publicacao = new Publicacoes();
         publicacao.setTexto(publicacaoDTO.getTexto());
-        publicacao.setUsuario(usuario); // Associa o usuário à publicação
+        publicacao.setNomeUsuario(usuario.getNome()); // Define o nome do usuário
+        publicacao.setFotoUsuario(usuario.getFoto()); // Define a foto do usuário
 
-        if (publicacaoDTO.getFotos() != null) {
-            List<Fotos> fotos = new ArrayList<>();
-            for (String caminhoFoto : publicacaoDTO.getFotos()) {
-                Fotos foto = new Fotos();
-                foto.setCaminhoFoto(caminhoFoto);
-                foto.setUsuario(usuario); // Associa o usuário à foto
+        // Salva a publicação no banco de dados
+        Publicacoes publicacaoSalva = publicacaoRepository.save(publicacao);
 
-                // Adiciona a foto à lista
-                fotos.add(foto);
-            }
-            publicacao.setFotos(fotos);  // Associa a lista de fotos à publicação
+        // Se houver fotos ou vídeos, salva os arquivos e associa à publicação
+        if (publicacaoDTO.getFotos() != null || publicacaoDTO.getVideos() != null) {
+            salvarArquivos(publicacaoSalva.getIdPublicacao(), publicacaoDTO.getFotos(), publicacaoDTO.getVideos());
         }
 
-        // Salvar a publicação com as fotos associadas
-        return publicacaoRepository.save(publicacao);
+        return publicacaoSalva;
     }
 
-    public List<Publicacoes> listarPublicacoes() {
-        return publicacaoRepository.findAll();
+    // Salva fotos e vídeos associados a uma publicação
+    public void salvarArquivos(Long publicacaoId, List<String> fotosCaminhos, List<String> videosCaminhos) {
+        Publicacoes publicacao = publicacaoRepository.findById(publicacaoId)
+                .orElseThrow(() -> new RuntimeException("Publicação não encontrada"));
+
+        // Salvar fotos
+        if (fotosCaminhos != null && !fotosCaminhos.isEmpty()) {
+            // Limpa a coleção existente de fotos
+            publicacao.getFotos().clear();
+
+            // Adiciona as novas fotos
+            for (String caminhoFoto : fotosCaminhos) {
+                Fotos foto = new Fotos();
+                foto.setCaminhoFoto(caminhoFoto);
+                foto.setUsuario(publicacao.getUsuario()); // Associa ao usuário
+                foto.setPublicacao(publicacao); // Associa à publicação
+                publicacao.getFotos().add(foto); // Adiciona à coleção existente
+            }
+        }
+
+        // Salvar vídeos
+        if (videosCaminhos != null && !videosCaminhos.isEmpty()) {
+            publicacao.setVideos(videosCaminhos);
+        }
+
+        publicacaoRepository.save(publicacao);
     }
 
+    // Método para salvar um arquivo no diretório e retornar o caminho
+    public String salvarArquivo(MultipartFile arquivo, String diretorio) {
+        try {
+            String nomeArquivo = UUID.randomUUID().toString() + "_" + arquivo.getOriginalFilename();
+            Path caminhoCompleto = Paths.get(diretorio, nomeArquivo);
+            Files.copy(arquivo.getInputStream(), caminhoCompleto, StandardCopyOption.REPLACE_EXISTING);
+            return caminhoCompleto.toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Erro ao salvar arquivo", e);
+        }
+    }
+
+    // Lista todas as publicações
+    public List<PublicacaoDTO> listarPublicacoes() {
+        List<Publicacoes> publicacoes = publicacaoRepository.findAll();
+        List<PublicacaoDTO> publicacoesDTO = new ArrayList<>();
+
+        for (Publicacoes p : publicacoes) {
+            PublicacaoDTO dto = new PublicacaoDTO();
+            dto.setIdUsuario(p.getUsuario().getIdusuario());
+            dto.setTexto(p.getTexto());
+            dto.setNomeUsuario(p.getUsuario().getNome());
+            dto.setFotoUsuario(p.getUsuario().getFoto());
+
+            // Mapear as fotos corretamente
+            List<String> fotosCaminhos = new ArrayList<>();
+            if (p.getFotos() != null) {
+                for (Fotos foto : p.getFotos()) {
+                    fotosCaminhos.add(foto.getCaminhoFoto());
+                }
+            }
+            dto.setFotos(fotosCaminhos);
+
+            // Mapear os vídeos corretamente
+            List<String> videosCaminhos = p.getVideos();
+            dto.setVideos(videosCaminhos);
+
+            publicacoesDTO.add(dto);
+        }
+        return publicacoesDTO;
+    }
+
+    // Busca uma publicação por ID
     public Publicacoes buscarPublicacaoPorId(Long id) {
         return publicacaoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Publicação não encontrada"));
     }
 
+
+
+    // Edita uma publicação existente
     public Publicacoes editarPublicacao(Long id, PublicacaoDTO publicacaoDTO) {
-        // Verifica se a publicação existe
         Publicacoes publicacao = publicacaoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Publicação não encontrada"));
 
-        // Atualiza o texto da publicação
         publicacao.setTexto(publicacaoDTO.getTexto());
 
-        // Atualiza as fotos se existirem
+        // Atualiza as fotos
         if (publicacaoDTO.getFotos() != null) {
-            List<Fotos> fotos = new ArrayList<>();
+            List<Fotos> fotosEntidades = new ArrayList<>();
             for (String caminhoFoto : publicacaoDTO.getFotos()) {
                 Fotos foto = new Fotos();
                 foto.setCaminhoFoto(caminhoFoto);
-                foto.setUsuario(publicacao.getUsuario());
-                fotos.add(foto);
+                foto.setUsuario(publicacao.getUsuario()); // Associa ao usuário
+                foto.setPublicacao(publicacao); // Associa à publicação
+                fotosEntidades.add(foto);
             }
-            publicacao.setFotos(fotos);
+            publicacao.setFotos(fotosEntidades);
         }
 
-        // Salva a publicação editada
+        // Atualiza os vídeos
+        if (publicacaoDTO.getVideos() != null) {
+            publicacao.setVideos(publicacaoDTO.getVideos());
+        }
+
         return publicacaoRepository.save(publicacao);
     }
 
+    // Deleta uma publicação por ID
     public void deletarPublicacao(Long id) {
         Publicacoes publicacao = publicacaoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Publicação não encontrada"));
 
-        // Deleta a publicação
         publicacaoRepository.delete(publicacao);
     }
-
-
-
 }

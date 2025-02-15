@@ -21,6 +21,12 @@ public class Publicacoes {
     @Column(columnDefinition = "TEXT")
     private String texto;
 
+    private String nomeUsuario;
+
+    private String fotoUsuario;
+
+
+
     @CreationTimestamp
     private Date dataCadastro;
 
@@ -36,12 +42,18 @@ public class Publicacoes {
     @JsonManagedReference
     private List<Fotos> fotos;
 
+    @ElementCollection
+    private List<String> videos;
+
     public Publicacoes() {
     }
 
-    public Publicacoes(Long idPublicacao, String texto, Date dataCadastro,Date dataAtualizacao, Usuarios usuario, List<Fotos> fotos) {
+    public Publicacoes(Long idPublicacao, String texto, String nomeUsuario, String fotoUsuario, List<String> videos, Date dataCadastro, Date dataAtualizacao, Usuarios usuario, List<Fotos> fotos) {
         this.idPublicacao = idPublicacao;
         this.texto = texto;
+        this.nomeUsuario = nomeUsuario;
+        this.fotoUsuario = fotoUsuario;
+        this.videos = videos;
         this.dataCadastro = dataCadastro;
         this.dataAtualizacao = dataAtualizacao;
         this.usuario = usuario;
@@ -96,11 +108,38 @@ public class Publicacoes {
         this.fotos = fotos;
     }
 
+    public String getNomeUsuario() {
+        return nomeUsuario;
+    }
+
+    public void setNomeUsuario(String nomeUsuario) {
+        this.nomeUsuario = nomeUsuario;
+    }
+
+    public String getFotoUsuario() {
+        return fotoUsuario;
+    }
+
+    public void setFotoUsuario(String fotoUsuario) {
+        this.fotoUsuario = fotoUsuario;
+    }
+
+    public List<String> getVideos() {
+        return videos;
+    }
+
+    public void setVideos(List<String> videos) {
+        this.videos = videos;
+    }
+
     @Override
     public String toString() {
         return "Publicacoes{" +
                 "idPublicacao=" + idPublicacao +
                 ", texto='" + texto + '\'' +
+                ", nomeUsuario='" + nomeUsuario + '\'' +
+                ", fotoUsuario='" + fotoUsuario + '\'' +
+                ", videos=" + videos +
                 ", dataCadastro=" + dataCadastro +
                 ", dataAtualizacao=" + dataAtualizacao +
                 ", usuario=" + usuario +
