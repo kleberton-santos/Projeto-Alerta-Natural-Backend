@@ -79,6 +79,13 @@ public class PublicacoesController {
         return ResponseEntity.ok(publicacao);
     }
 
+    @Operation(summary = "Buscar publicações por ID do usuário", description = "Retorna todas as publicações de um usuário específico")
+    @GetMapping("/usuario/{idUsuario}")
+    public ResponseEntity<List<PublicacaoDTO>> buscarPublicacoesPorUsuario(@PathVariable Long idUsuario) {
+        List<PublicacaoDTO> publicacoes = publicacoesService.buscarPublicacoesPorUsuario(idUsuario);
+        return ResponseEntity.ok(publicacoes);
+    }
+
     @Operation(summary = "Editar publicação", description = "Edita a publicação existente com base no ID fornecido")
     @PutMapping("/{id}")
     public ResponseEntity<Publicacoes> editarPublicacao(@PathVariable Long id, @RequestBody PublicacaoDTO publicacaoDTO) {
