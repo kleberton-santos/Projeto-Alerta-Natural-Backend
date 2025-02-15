@@ -144,6 +144,35 @@ public class PublicacoesService {
     }
 
 
+    public List<PublicacaoDTO> buscarPublicacoesPorUsuario(Long idUsuario) {
+        List<Publicacoes> publicacoes = publicacaoRepository.findByUsuarioIdusuario(idUsuario);
+        List<PublicacaoDTO> publicacoesDTO = new ArrayList<>();
+
+        for (Publicacoes p : publicacoes) {
+            PublicacaoDTO dto = new PublicacaoDTO();
+            dto.setIdUsuario(p.getUsuario().getIdusuario());
+            dto.setTexto(p.getTexto());
+            dto.setNomeUsuario(p.getUsuario().getNome());
+            dto.setFotoUsuario(p.getUsuario().getFoto());
+
+            // Mapear as fotos corretamente
+            List<String> fotosCaminhos = new ArrayList<>();
+            if (p.getFotos() != null) {
+                for (Fotos foto : p.getFotos()) {
+                    fotosCaminhos.add(foto.getCaminhoFoto());
+                }
+            }
+            dto.setFotos(fotosCaminhos);
+
+            // Mapear os vídeos corretamente
+            List<String> videosCaminhos = p.getVideos();
+            dto.setVideos(videosCaminhos);
+
+            publicacoesDTO.add(dto);
+        }
+        return publicacoesDTO;
+    }
+
 
     // Edita uma publicação existente
     public Publicacoes editarPublicacao(Long id, PublicacaoDTO publicacaoDTO) {
