@@ -13,6 +13,7 @@ public interface PublicacaoRepository extends JpaRepository<Publicacoes, Long> {
     Optional<Publicacoes> findByIdWithFotos(@Param("id") Long id);
 
     List<Publicacoes> findByUsuarioIdusuario(Long idUsuario);
+    List<Publicacoes> findByUsuarioIdusuarioIn(List<Long> idsUsuarios);
 
 
 }

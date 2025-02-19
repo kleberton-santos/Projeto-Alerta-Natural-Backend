@@ -101,4 +101,10 @@ public class PublicacoesController {
         publicacoesService.deletarPublicacao(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @GetMapping("/amigos/{idUsuario}")
+    public ResponseEntity<List<PublicacaoDTO>> buscarPublicacoesAmigos(@PathVariable Long idUsuario) {
+        List<PublicacaoDTO> publicacoes = publicacoesService.buscarPublicacoesAmigos(idUsuario);
+        return ResponseEntity.ok(publicacoes);
+    }
 }

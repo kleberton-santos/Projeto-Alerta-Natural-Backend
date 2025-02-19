@@ -48,4 +48,15 @@ public class AmigosController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(seguidores);
     }
+
+    @Operation(summary = "Buscar idUsuario do amigo pelo idAmigo", description = "Retorna o idUsuario do amigo com base no idAmigo")
+    @GetMapping("/buscar-idusuario/{idAmigo}")
+    public ResponseEntity<Long> buscarIdUsuarioPorAmigo(@PathVariable Long idAmigo) {
+        Long idUsuario = amigosService.buscarIdUsuarioPorAmigo(idAmigo);
+        if (idUsuario != null) {
+            return ResponseEntity.ok(idUsuario);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

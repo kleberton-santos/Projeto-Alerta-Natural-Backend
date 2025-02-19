@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,5 +44,10 @@ public class AmigosService {
         return amigosRepository.findAll().stream()
                 .filter(a -> a.getAmigo().getIdusuario().equals(idUsuario))
                 .collect(Collectors.toList());
+    }
+
+    public Long buscarIdUsuarioPorAmigo(Long idAmigo) {
+        Optional<Amigos> amigo = amigosRepository.findById(idAmigo);
+        return amigo.map(Amigos::getAmigo).map(Usuarios::getIdusuario).orElse(null);
     }
 }
