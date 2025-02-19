@@ -102,6 +102,11 @@ public class UsuarioService {
         return nomeArquivo;
     }
 
+    public List<Usuarios> listarUsuariosPorNome(String nome) {
+        return usuarioRepository.findByNomeContainingIgnoreCase(nome);
+    }
+
+
 }
 
 

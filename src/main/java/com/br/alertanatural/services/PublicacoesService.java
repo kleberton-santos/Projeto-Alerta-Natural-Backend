@@ -1,9 +1,11 @@
 package com.br.alertanatural.services;
 
 import com.br.alertanatural.DTOs.PublicacaoDTO;
+import com.br.alertanatural.models.Amigos;
 import com.br.alertanatural.models.Fotos;
 import com.br.alertanatural.models.Publicacoes;
 import com.br.alertanatural.models.Usuarios;
+import com.br.alertanatural.repositories.AmigosRepository;
 import com.br.alertanatural.repositories.FotoRepository;
 import com.br.alertanatural.repositories.PublicacaoRepository;
 import com.br.alertanatural.repositories.UsuarioRepository;
@@ -20,6 +22,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class PublicacoesService {
@@ -35,6 +38,9 @@ public class PublicacoesService {
 
     @Autowired
     private FotoRepository fotoRepository;
+
+    @Autowired
+    private AmigosRepository amigosRepository;
 
     // Método para expor o diretório de fotos
     public String getDiretorioFotos() {
@@ -208,5 +214,37 @@ public class PublicacoesService {
                 .orElseThrow(() -> new RuntimeException("Publicação não encontrada"));
 
         publicacaoRepository.delete(publicacao);
+    }
+
+
+    public List<PublicacaoDTO> buscarPublicacoesAmigos(Long idUsuario) {
+        // Busca a lista de amigos do usuário
+        List<Amigos> amigos = amigosRepository.findByUsuarioIdusuario(idUsuario);
+
+        // Extrai os IDs dos amigos
+        List<Long> idsAmigos = amigos.stream()
+                .map(amigo -> amigo.getAmigo().getIdusuario()) // Extrai o ID do amigo
+                .collect(Collectors.toList());
+
+        // Busca as publicações dos amigos
+        List<Publicacoes> publicacoes = publicacaoRepository.findByUsuarioIdusuarioIn(idsAmigos);
+
+        // Converte as publicações para DTO
+        return converterParaDTO(publicacoes);
+    }
+
+    private List<PublicacaoDTO> converterParaDTO(List<Publicacoes> publicacoes) {
+        return publicacoes.stream()
+                .map(publicacao -> new PublicacaoDTO(
+                        publicacao.getUsuario().getIdusuario(), // idUsuario
+                        publicacao.getTexto(),                 // texto
+                        publicacao.getNomeUsuario(),           // nomeUsuario
+                        publicacao.getFotoUsuario(),           // fotoUsuario
+                        publicacao.getFotos().stream()         // fotos (extrai os caminhos das fotos)
+                                .map(Fotos::getCaminhoFoto)        // Extrai o caminho de cada foto
+                                .collect(Collectors.toList()),     // Converte para List<String>
+                        publicacao.getVideos()                 // videos
+                ))
+                .collect(Collectors.toList());             // Coleta os resultados em uma lista de PublicacaoDTO
     }
 }

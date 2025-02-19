@@ -94,6 +94,18 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
         }
     }
+
+    @Operation(summary = "Buscar usuários por nome", description = "Retorna uma lista de usuários cujos nomes contenham a string fornecida")
+    @GetMapping("/buscarPorNome")
+    public ResponseEntity<List<Usuarios>> listarUsuariosPorNome(@RequestParam String nome) {
+        List<Usuarios> usuarios = usuarioService.listarUsuariosPorNome(nome);
+        if (usuarios.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(usuarios);
+    }
+
+
 }
 
 
