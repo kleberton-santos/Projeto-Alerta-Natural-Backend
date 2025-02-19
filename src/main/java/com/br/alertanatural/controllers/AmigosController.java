@@ -7,6 +7,7 @@ import com.br.alertanatural.services.AmigosService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,4 +60,22 @@ public class AmigosController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @Operation(summary = "Remover um amigo", description = "Remove um amigo da lista de amigos do usuário")
+    @DeleteMapping("/remover")
+    public ResponseEntity<Void> removerAmigo(@RequestParam Long idUsuario, @RequestParam Long idAmigoUsuario) {
+        try {
+            boolean amizadeExiste = amigosService.verificarAmizade(idUsuario, idAmigoUsuario);
+            if (!amizadeExiste) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+
+            amigosService.removerAmigo(idUsuario, idAmigoUsuario);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            System.err.println("Erro ao remover amigo: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 }

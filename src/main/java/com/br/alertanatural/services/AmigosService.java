@@ -4,6 +4,7 @@ import com.br.alertanatural.models.Amigos;
 import com.br.alertanatural.models.Usuarios;
 import com.br.alertanatural.repositories.AmigosRepository;
 import com.br.alertanatural.repositories.UsuarioRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,5 +50,14 @@ public class AmigosService {
     public Long buscarIdUsuarioPorAmigo(Long idAmigo) {
         Optional<Amigos> amigo = amigosRepository.findById(idAmigo);
         return amigo.map(Amigos::getAmigo).map(Usuarios::getIdusuario).orElse(null);
+    }
+
+    public boolean verificarAmizade(Long idUsuario, Long idAmigoUsuario) {
+        return amigosRepository.existsByUsuarioIdusuarioAndAmigoIdusuario(idUsuario, idAmigoUsuario);
+    }
+
+    @Transactional
+    public void removerAmigo(Long idUsuario, Long idAmigoUsuario) {
+        amigosRepository.deleteByUsuarioIdAndAmigoId(idUsuario, idAmigoUsuario);
     }
 }
