@@ -107,4 +107,16 @@ public class PublicacoesController {
         List<PublicacaoDTO> publicacoes = publicacoesService.buscarPublicacoesAmigos(idUsuario);
         return ResponseEntity.ok(publicacoes);
     }
+
+    @Operation(summary = "Deletar publicação por ID do usuário", description = "Deleta uma publicação específica do usuário")
+    @DeleteMapping("/usuario/{idUsuario}/{idPublicacao}")
+    public ResponseEntity<Void> deletarPublicacaoPorUsuario(
+            @PathVariable Long idUsuario,
+            @PathVariable Long idPublicacao) {
+        if (idUsuario == null || idPublicacao == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        publicacoesService.deletarPublicacaoPorUsuario(idUsuario, idPublicacao);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }

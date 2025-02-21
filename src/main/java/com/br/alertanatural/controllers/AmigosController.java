@@ -78,4 +78,13 @@ public class AmigosController {
         }
     }
 
+    @Operation(summary = "Verificar se um usuário está seguindo outro", description = "Retorna true se o usuário está seguindo o amigo, caso contrário, retorna false")
+    @GetMapping("/verificar-amizade")
+    public ResponseEntity<Boolean> verificarAmizade(
+            @RequestParam Long idUsuario,
+            @RequestParam Long idAmigoUsuario) {
+        boolean amizadeExiste = amigosService.verificarAmizade(idUsuario, idAmigoUsuario);
+        return ResponseEntity.ok(amizadeExiste);
+    }
+
 }
