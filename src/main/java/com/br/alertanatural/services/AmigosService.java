@@ -60,4 +60,8 @@ public class AmigosService {
     public void removerAmigo(Long idUsuario, Long idAmigoUsuario) {
         amigosRepository.deleteByUsuarioIdAndAmigoId(idUsuario, idAmigoUsuario);
     }
+
+
+
+
 }

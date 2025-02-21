@@ -3,6 +3,7 @@ package com.br.alertanatural.DTOs;
 import java.util.List;
 
 public class PublicacaoDTO {
+    private Long idPublicacao;
     private Long idUsuario;
     private String texto;
     private String nomeUsuario;
@@ -10,7 +11,8 @@ public class PublicacaoDTO {
     private List<String> fotos;
     private List<String> videos;
 
-    public PublicacaoDTO(Long idUsuario, String texto, String nomeUsuario, String fotoUsuario, List<String> fotos, List<String> videos) {
+    public PublicacaoDTO(Long idPublicacao, Long idUsuario, String texto, String nomeUsuario, String fotoUsuario, List<String> fotos, List<String> videos) {
+        this.idPublicacao = idPublicacao;
         this.idUsuario = idUsuario;
         this.texto = texto;
         this.nomeUsuario = nomeUsuario;
@@ -20,6 +22,15 @@ public class PublicacaoDTO {
     }
 
     public PublicacaoDTO() {}
+
+    // Getters e Setters para todos os campos
+    public Long getIdPublicacao() {
+        return idPublicacao;
+    }
+
+    public void setIdPublicacao(Long idPublicacao) {
+        this.idPublicacao = idPublicacao;
+    }
 
     public Long getIdUsuario() {
         return idUsuario;
@@ -37,12 +48,12 @@ public class PublicacaoDTO {
         this.texto = texto;
     }
 
-    public List<String> getFotos() {
-        return fotos;
+    public String getNomeUsuario() {
+        return nomeUsuario;
     }
 
-    public void setFotos(List<String> fotos) {
-        this.fotos = fotos;
+    public void setNomeUsuario(String nomeUsuario) {
+        this.nomeUsuario = nomeUsuario;
     }
 
     public String getFotoUsuario() {
@@ -53,12 +64,12 @@ public class PublicacaoDTO {
         this.fotoUsuario = fotoUsuario;
     }
 
-    public String getNomeUsuario() {
-        return nomeUsuario;
+    public List<String> getFotos() {
+        return fotos;
     }
 
-    public void setNomeUsuario(String nomeUsuario) {
-        this.nomeUsuario = nomeUsuario;
+    public void setFotos(List<String> fotos) {
+        this.fotos = fotos;
     }
 
     public List<String> getVideos() {

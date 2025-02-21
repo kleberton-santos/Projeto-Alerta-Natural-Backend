@@ -156,6 +156,7 @@ public class PublicacoesService {
 
         for (Publicacoes p : publicacoes) {
             PublicacaoDTO dto = new PublicacaoDTO();
+            dto.setIdPublicacao(p.getIdPublicacao()); // Mapeia o ID da publicação
             dto.setIdUsuario(p.getUsuario().getIdusuario());
             dto.setTexto(p.getTexto());
             dto.setNomeUsuario(p.getUsuario().getNome());
@@ -236,6 +237,7 @@ public class PublicacoesService {
     private List<PublicacaoDTO> converterParaDTO(List<Publicacoes> publicacoes) {
         return publicacoes.stream()
                 .map(publicacao -> new PublicacaoDTO(
+                        publicacao.getIdPublicacao(), // Inclua o idPublicacao
                         publicacao.getUsuario().getIdusuario(), // idUsuario
                         publicacao.getTexto(),                 // texto
                         publicacao.getNomeUsuario(),           // nomeUsuario
@@ -246,5 +248,22 @@ public class PublicacoesService {
                         publicacao.getVideos()                 // videos
                 ))
                 .collect(Collectors.toList());             // Coleta os resultados em uma lista de PublicacaoDTO
+    }
+
+    public void deletarPublicacaoPorUsuario(Long idUsuario, Long idPublicacao) {
+        if (idUsuario == null || idPublicacao == null) {
+            throw new IllegalArgumentException("ID do usuário e ID da publicação não podem ser nulos.");
+        }
+
+        // Busca a publicação pelo ID e verifica se pertence ao usuário
+        Publicacoes publicacao = publicacaoRepository.findById(idPublicacao)
+                .orElseThrow(() -> new RuntimeException("Publicação não encontrada."));
+
+        if (!publicacao.getUsuario().getIdusuario().equals(idUsuario)) {
+            throw new RuntimeException("Usuário não tem permissão para deletar esta publicação.");
+        }
+
+        // Deleta a publicação
+        publicacaoRepository.delete(publicacao);
     }
 }
