@@ -65,13 +65,12 @@ public class PublicacoesController {
 
 
 
-    @Operation(summary = "Listar todas as publicações", description = "Retorna todas as publicações disponíveis")
+    @Operation(summary = "Listar todas as publicações", description = "Retorna todas as publicações disponíveis, ordenadas por data de cadastro")
     @GetMapping
     public ResponseEntity<List<PublicacaoDTO>> listarPublicacoes() {
         List<PublicacaoDTO> publicacoes = publicacoesService.listarPublicacoes();
         return ResponseEntity.ok(publicacoes);
     }
-
     @Operation(summary = "Buscar publicação por ID", description = "Retorna a publicação correspondente ao ID fornecido")
     @GetMapping("/{id}")
     public ResponseEntity<Publicacoes> buscarPublicacaoPorId(@PathVariable Long id) {
