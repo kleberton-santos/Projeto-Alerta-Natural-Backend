@@ -1,5 +1,6 @@
 package com.br.alertanatural.DTOs;
 
+import java.util.Date;
 import java.util.List;
 
 public class PublicacaoDTO {
@@ -10,8 +11,9 @@ public class PublicacaoDTO {
     private String fotoUsuario;
     private List<String> fotos;
     private List<String> videos;
+    private Date dataCadastro;
 
-    public PublicacaoDTO(Long idPublicacao, Long idUsuario, String texto, String nomeUsuario, String fotoUsuario, List<String> fotos, List<String> videos) {
+    public PublicacaoDTO(Long idPublicacao, Long idUsuario, String texto, String nomeUsuario, String fotoUsuario, List<String> fotos, List<String> videos, Date dataCadastro) {
         this.idPublicacao = idPublicacao;
         this.idUsuario = idUsuario;
         this.texto = texto;
@@ -19,8 +21,8 @@ public class PublicacaoDTO {
         this.fotoUsuario = fotoUsuario;
         this.fotos = fotos;
         this.videos = videos;
+        this.dataCadastro = dataCadastro;
     }
-
     public PublicacaoDTO() {}
 
     // Getters e Setters para todos os campos
@@ -78,5 +80,12 @@ public class PublicacaoDTO {
 
     public void setVideos(List<String> videos) {
         this.videos = videos;
+    }
+    public Date getDataCadastro() {
+        return dataCadastro;
+    }
+
+    public void setDataCadastro(Date dataCadastro) {
+        this.dataCadastro = dataCadastro;
     }
 }

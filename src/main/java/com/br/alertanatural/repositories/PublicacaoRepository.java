@@ -14,6 +14,7 @@ public interface PublicacaoRepository extends JpaRepository<Publicacoes, Long> {
 
     List<Publicacoes> findByUsuarioIdusuario(Long idUsuario);
     List<Publicacoes> findByUsuarioIdusuarioIn(List<Long> idsUsuarios);
+    List<Publicacoes> findAllByOrderByDataCadastroDesc();
 
 
 }

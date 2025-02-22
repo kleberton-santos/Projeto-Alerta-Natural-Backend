@@ -115,34 +115,24 @@ public class PublicacoesService {
 
     // Lista todas as publicações
     public List<PublicacaoDTO> listarPublicacoes() {
-        List<Publicacoes> publicacoes = publicacaoRepository.findAll();
+        List<Publicacoes> publicacoes = publicacaoRepository.findAllByOrderByDataCadastroDesc(); // Ordena por dataCadastro decrescente
         List<PublicacaoDTO> publicacoesDTO = new ArrayList<>();
 
         for (Publicacoes p : publicacoes) {
-            PublicacaoDTO dto = new PublicacaoDTO();
-            dto.setIdUsuario(p.getUsuario().getIdusuario());
-            dto.setTexto(p.getTexto());
-            dto.setNomeUsuario(p.getUsuario().getNome());
-            dto.setFotoUsuario(p.getUsuario().getFoto());
-
-            // Mapear as fotos corretamente
-            List<String> fotosCaminhos = new ArrayList<>();
-            if (p.getFotos() != null) {
-                for (Fotos foto : p.getFotos()) {
-                    fotosCaminhos.add(foto.getCaminhoFoto());
-                }
-            }
-            dto.setFotos(fotosCaminhos);
-
-            // Mapear os vídeos corretamente
-            List<String> videosCaminhos = p.getVideos();
-            dto.setVideos(videosCaminhos);
-
+            PublicacaoDTO dto = new PublicacaoDTO(
+                    p.getIdPublicacao(),
+                    p.getUsuario().getIdusuario(),
+                    p.getTexto(),
+                    p.getNomeUsuario(),
+                    p.getFotoUsuario(),
+                    p.getFotos().stream().map(Fotos::getCaminhoFoto).collect(Collectors.toList()),
+                    p.getVideos(),
+                    p.getDataCadastro() // Adicionado
+            );
             publicacoesDTO.add(dto);
         }
         return publicacoesDTO;
     }
-
     // Busca uma publicação por ID
     public Publicacoes buscarPublicacaoPorId(Long id) {
         return publicacaoRepository.findById(id)
@@ -245,7 +235,8 @@ public class PublicacoesService {
                         publicacao.getFotos().stream()         // fotos (extrai os caminhos das fotos)
                                 .map(Fotos::getCaminhoFoto)        // Extrai o caminho de cada foto
                                 .collect(Collectors.toList()),     // Converte para List<String>
-                        publicacao.getVideos()                 // videos
+                        publicacao.getVideos(),
+                        publicacao.getDataCadastro()// videos
                 ))
                 .collect(Collectors.toList());             // Coleta os resultados em uma lista de PublicacaoDTO
     }
