@@ -38,8 +38,15 @@ public class UsuarioService {
     }
 
     public Usuarios criarUsuario(Usuarios usuario) {
-        // Criptografar a senha antes de salvar no banco
-        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+        // Verifica se a senha foi fornecida
+        if (usuario.getSenha() != null) {
+            // Criptografar a senha antes de salvar no banco
+            usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+        } else {
+            // Define uma senha padrão para usuários OAuth2 (opcional)
+            usuario.setSenha("OAUTH2_USER"); // Você pode usar um valor fixo ou gerar um UUID
+        }
+
         return usuarioRepository.save(usuario);
     }
 

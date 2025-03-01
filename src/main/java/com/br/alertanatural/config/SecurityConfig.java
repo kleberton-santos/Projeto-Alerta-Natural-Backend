@@ -19,17 +19,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())  // Desabilita CSRF, se necessário
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
-                        // Libera o acesso para as URLs do Swagger
-                       .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        // Libera o acesso para o login e refresh token
-                        .requestMatchers("/api/auth/login", "/usuarios", "/api/auth/refresh-token", "/**").permitAll()
-                        // Exige autenticação para outras rotas
-                     //           .requestMatchers("/**").permitAll()
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/auth/login", "/usuarios", "/api/auth/refresh-token", "/api/auth/oauth2/**", "/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                // Adiciona o filtro de autenticação JWT
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login") // Página de login personalizada
+                        .defaultSuccessUrl("/api/auth/oauth2/google", true) // Redireciona para o endpoint após o login
+                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
