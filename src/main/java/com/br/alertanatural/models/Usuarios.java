@@ -36,6 +36,8 @@ public class Usuarios {
 
     private String foto;
 
+    private String tokenRedefinicaoSenha;
+
     @CreationTimestamp
     private Date dataCadastro;
 
@@ -184,6 +186,14 @@ public class Usuarios {
 
     public void setSeguidores(List<Amigos> seguidores) {
         this.seguidores = seguidores;
+    }
+
+    public String getTokenRedefinicaoSenha() {
+        return tokenRedefinicaoSenha;
+    }
+
+    public void setTokenRedefinicaoSenha(String tokenRedefinicaoSenha) {
+        this.tokenRedefinicaoSenha = tokenRedefinicaoSenha;
     }
 
     @Override

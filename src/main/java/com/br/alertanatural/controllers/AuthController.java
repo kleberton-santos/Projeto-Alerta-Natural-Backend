@@ -11,7 +11,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +36,12 @@ public class AuthController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // Endpoint para login e geração de token
     @Operation(summary = "Login de usuário", description = "Realiza o login do usuário e retorna os tokens de acesso e refresh")
@@ -121,4 +131,68 @@ public class AuthController {
         // Redireciona para a página de feed com o token e os dados do usuário como parâmetros
         response.sendRedirect("http://localhost:5173/feed?token=" + accessToken + "&user=" + URLEncoder.encode(userData, "UTF-8"));
     }
+
+
+    // Endpoint para solicitar redefinição de senha
+    @Operation(summary = "Solicitar redefinição de senha", description = "Envia um e-mail com um link para redefinir a senha")
+    @PostMapping("/esqueci-senha")
+    public ResponseEntity<?> solicitarRedefinicaoSenha(@RequestParam String email) {
+        Optional<Usuarios> usuarioOpt = usuarioService.listarUsuariosPorEmail(email);
+
+        if (usuarioOpt.isPresent()) {
+            Usuarios usuario = usuarioOpt.get();
+            String token = jwtTokenProvider.generateToken(email); // Gera um token de redefinição
+
+            // Salva o token no banco de dados
+            usuario.setTokenRedefinicaoSenha(token);
+            usuarioService.atualizarUsuario(usuario);
+
+            // Envia o e-mail com o link de redefinição
+            String resetLink = "http://localhost:5173/redefinir-senha?token=" + token;
+            String mensagem = "Para redefinir sua senha, clique no link abaixo:\n" + resetLink;
+
+            SimpleMailMessage mailMessage = new SimpleMailMessage();
+            mailMessage.setTo(email);
+            mailMessage.setSubject("Redefinição de Senha");
+            mailMessage.setText(mensagem);
+            mailSender.send(mailMessage);
+
+            return ResponseEntity.ok("E-mail de redefinição de senha enviado com sucesso.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("E-mail não encontrado.");
+        }
+    }
+
+    // Endpoint para redefinir a senha
+    @Operation(summary = "Redefinir senha", description = "Redefine a senha do usuário com base no token de redefinição")
+    @PostMapping("/redefinir-senha")
+    public ResponseEntity<?> redefinirSenha(@RequestParam String token, @RequestParam String novaSenha) {
+        // Valida o token
+        if (jwtTokenProvider.validateToken(token)) {
+            String email = jwtTokenProvider.getEmailFromToken(token);
+
+            Optional<Usuarios> usuarioOpt = usuarioService.listarUsuariosPorEmail(email);
+
+            if (usuarioOpt.isPresent()) {
+                Usuarios usuario = usuarioOpt.get();
+
+                // Verifica se o token de redefinição é o mesmo que foi salvo no banco
+                if (token.equals(usuario.getTokenRedefinicaoSenha())) {
+                    // Atualiza a senha
+                    usuario.setSenha(passwordEncoder.encode(novaSenha));
+                    usuario.setTokenRedefinicaoSenha(null); // Limpa o token de redefinição
+                    usuarioService.atualizarUsuario(usuario);
+
+                    return ResponseEntity.ok("Senha redefinida com sucesso.");
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token inválido.");
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado.");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token inválido ou expirado.");
+        }
+    }
+
 }

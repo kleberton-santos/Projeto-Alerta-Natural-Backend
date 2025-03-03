@@ -113,6 +113,10 @@ public class UsuarioService {
         return usuarioRepository.findByNomeContainingIgnoreCase(nome);
     }
 
+    public Usuarios atualizarUsuario(Usuarios usuario) {
+        return usuarioRepository.save(usuario);
+    }
+
 
 }
 
