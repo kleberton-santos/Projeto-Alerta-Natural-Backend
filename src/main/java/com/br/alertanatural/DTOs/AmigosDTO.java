@@ -17,7 +17,6 @@ public class AmigosDTO {
         this.dataCadastro = amigos.getDataCadastro();
     }
 
-    // Getters e Setters
     public Long getIdAmigo() {
         return idAmigo;
     }

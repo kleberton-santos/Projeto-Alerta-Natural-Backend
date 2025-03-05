@@ -17,12 +17,18 @@ public class LoginService {
     @Autowired
     private PasswordEncoder passwordEncoder;  // Alteração: agora injetando PasswordEncoder em vez de BCryptPasswordEncoder
 
+    // Método para autenticar um usuário com email e senha
     public boolean autenticar(String email, String senha) {
+        // Busca o usuário no banco de dados pelo email
         Optional<Usuarios> usuarioOpt = usuarioRepository.findByEmail(email);
+
+        // Se o usuário for encontrado
         if (usuarioOpt.isPresent()) {
             Usuarios usuario = usuarioOpt.get();
-            return passwordEncoder.matches(senha, usuario.getSenha()); // Comparando senha digitada com a criptografada
+            // Compara a senha digitada com a senha criptografada armazenada no banco de dados
+            return passwordEncoder.matches(senha, usuario.getSenha()); // Retorna true se as senhas coincidirem
         }
+        // Se o usuário não for encontrado, retorna false
         return false;
     }
 }

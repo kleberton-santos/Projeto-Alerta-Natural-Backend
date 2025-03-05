@@ -12,8 +12,9 @@ public class PublicacaoDTO {
     private List<String> fotos;
     private List<String> videos;
     private Date dataCadastro;
+    private int curtidas;
 
-    public PublicacaoDTO(Long idPublicacao, Long idUsuario, String texto, String nomeUsuario, String fotoUsuario, List<String> fotos, List<String> videos, Date dataCadastro) {
+    public PublicacaoDTO(Long idPublicacao, Long idUsuario, String texto, String nomeUsuario, String fotoUsuario, List<String> fotos, List<String> videos, Date dataCadastro, int curtidas) {
         this.idPublicacao = idPublicacao;
         this.idUsuario = idUsuario;
         this.texto = texto;
@@ -22,10 +23,10 @@ public class PublicacaoDTO {
         this.fotos = fotos;
         this.videos = videos;
         this.dataCadastro = dataCadastro;
+        this.curtidas = curtidas;
     }
     public PublicacaoDTO() {}
 
-    // Getters e Setters para todos os campos
     public Long getIdPublicacao() {
         return idPublicacao;
     }
@@ -87,5 +88,12 @@ public class PublicacaoDTO {
 
     public void setDataCadastro(Date dataCadastro) {
         this.dataCadastro = dataCadastro;
+    }
+    public int getCurtidas() {
+        return curtidas;
+    }
+
+    public void setCurtidas(int curtidas) {
+        this.curtidas = curtidas;
     }
 }

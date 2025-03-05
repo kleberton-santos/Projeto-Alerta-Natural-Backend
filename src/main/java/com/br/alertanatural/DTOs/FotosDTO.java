@@ -14,8 +14,6 @@ public class FotosDTO {
     public FotosDTO() {
     }
 
-    // Construtores, getters e setters
-
     public FotosDTO(Long idFoto, String caminhoFoto, Date dataCadastro, Long idUsuario, Long idPublicacao) {
         this.idFoto = idFoto;
         this.caminhoFoto = caminhoFoto;

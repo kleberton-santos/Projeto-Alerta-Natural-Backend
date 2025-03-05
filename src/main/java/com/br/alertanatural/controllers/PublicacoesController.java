@@ -8,6 +8,7 @@ import com.br.alertanatural.models.Publicacoes;
 import com.br.alertanatural.models.Usuarios;
 import com.br.alertanatural.repositories.PublicacaoRepository;
 import com.br.alertanatural.services.ComentarioService;
+import com.br.alertanatural.services.CurtidaService;
 import com.br.alertanatural.services.PublicacoesService;
 import com.br.alertanatural.services.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,6 +37,9 @@ public class PublicacoesController {
     @Autowired
     private ComentarioService comentarioService;
 
+    @Autowired
+    private CurtidaService curtidaService;
+
     @Operation(summary = "Criar uma nova publicação", description = "Cria uma nova publicação com o texto fornecido")
     @PostMapping
     public ResponseEntity<Publicacoes> criarPublicacao(@RequestBody PublicacaoDTO publicacaoDTO) {
@@ -43,6 +47,7 @@ public class PublicacoesController {
         return ResponseEntity.status(HttpStatus.CREATED).body(publicacaoCriada);
     }
 
+    @Operation(summary = "Fazer upload de arquivos (fotos e vídeos) para uma publicação", description = "Permite o upload de fotos e vídeos para uma publicação existente")
     @PostMapping(value = "/{id}/arquivos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> uploadArquivos(
             @PathVariable Long id,
@@ -74,14 +79,13 @@ public class PublicacoesController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-
-
     @Operation(summary = "Listar todas as publicações", description = "Retorna todas as publicações disponíveis, ordenadas por data de cadastro")
     @GetMapping
     public ResponseEntity<List<PublicacaoDTO>> listarPublicacoes() {
         List<PublicacaoDTO> publicacoes = publicacoesService.listarPublicacoes();
         return ResponseEntity.ok(publicacoes);
     }
+
     @Operation(summary = "Buscar publicação por ID", description = "Retorna a publicação correspondente ao ID fornecido")
     @GetMapping("/{id}")
     public ResponseEntity<Publicacoes> buscarPublicacaoPorId(@PathVariable Long id) {
@@ -103,8 +107,6 @@ public class PublicacoesController {
         return ResponseEntity.ok(publicacaoAtualizada);
     }
 
-
-
     @Operation(summary = "Deletar publicação", description = "Deleta a publicação correspondente ao ID fornecido")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarPublicacao(@PathVariable Long id) {
@@ -112,6 +114,7 @@ public class PublicacoesController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @Operation(summary = "Buscar publicações de amigos", description = "Retorna todas as publicações dos amigos de um usuário específico")
     @GetMapping("/amigos/{idUsuario}")
     public ResponseEntity<List<PublicacaoDTO>> buscarPublicacoesAmigos(@PathVariable Long idUsuario) {
         List<PublicacaoDTO> publicacoes = publicacoesService.buscarPublicacoesAmigos(idUsuario);
@@ -130,7 +133,7 @@ public class PublicacoesController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    // Adicionar um comentário a uma publicação
+    @Operation(summary = "Adicionar comentário a uma publicação", description = "Permite que um usuário adicione um comentário a uma publicação")
     @PostMapping("/{idPublicacao}/comentarios")
     public ResponseEntity<ComentarioDTO> adicionarComentario(
             @PathVariable Long idPublicacao,
@@ -147,7 +150,7 @@ public class PublicacoesController {
         return ResponseEntity.status(HttpStatus.CREATED).body(comentarioDTO);
     }
 
-    // Listar comentários de uma publicação
+    @Operation(summary = "Listar comentários de uma publicação", description = "Retorna todos os comentários de uma publicação específica")
     @GetMapping("/{idPublicacao}/comentarios")
     public ResponseEntity<List<ComentarioDTO>> listarComentarios(@PathVariable Long idPublicacao) {
         Publicacoes publicacao = publicacoesService.buscarPublicacaoPorId(idPublicacao);
@@ -155,7 +158,7 @@ public class PublicacoesController {
         return ResponseEntity.ok(comentariosDTO);
     }
 
-    // Editar um comentário
+    @Operation(summary = "Editar um comentário", description = "Permite que um usuário edite um comentário existente em uma publicação")
     @PutMapping("/{idPublicacao}/comentarios/{idComentario}")
     public ResponseEntity<ComentarioDTO> editarComentario(
             @PathVariable Long idPublicacao,
@@ -175,7 +178,7 @@ public class PublicacoesController {
         return ResponseEntity.ok(comentarioDTO);
     }
 
-    // Remover um comentário
+    @Operation(summary = "Remover um comentário", description = "Permite que um usuário remova um comentário de uma publicação")
     @DeleteMapping("/{idPublicacao}/comentarios/{idComentario}")
     public ResponseEntity<Void> removerComentario(
             @PathVariable Long idPublicacao,
@@ -190,5 +193,30 @@ public class PublicacoesController {
 
         comentarioService.deletarComentario(idComentario);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @Operation(summary = "Curtir ou descurtir uma publicação", description = "Permite que um usuário curta ou descurta uma publicação")
+    @PostMapping("/{idPublicacao}/curtir")
+    public ResponseEntity<Void> curtirOuDescurtirPublicacao(
+            @PathVariable Long idPublicacao,
+            @RequestParam Long idUsuario) {
+
+        // Verifica se o usuário já curtiu a publicação
+        if (curtidaService.usuarioJaCurtiu(idUsuario, idPublicacao)) {
+            // Se já curtiu, descurte
+            curtidaService.descurtirPublicacao(idUsuario, idPublicacao);
+        } else {
+            // Se não curtiu, curte
+            curtidaService.curtirPublicacao(idUsuario, idPublicacao);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Operation(summary = "Contar curtidas de uma publicação", description = "Retorna o número de curtidas de uma publicação")
+    @GetMapping("/{idPublicacao}/curtidas")
+    public ResponseEntity<Integer> contarCurtidas(@PathVariable Long idPublicacao) {
+        int curtidas = curtidaService.contarCurtidas(idPublicacao);
+        return ResponseEntity.ok(curtidas);
     }
 }

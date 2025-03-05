@@ -132,7 +132,6 @@ public class AuthController {
         response.sendRedirect("http://localhost:5173/feed?token=" + accessToken + "&user=" + URLEncoder.encode(userData, "UTF-8"));
     }
 
-
     // Endpoint para solicitar redefinição de senha
     @Operation(summary = "Solicitar redefinição de senha", description = "Envia um e-mail com um link para redefinir a senha")
     @PostMapping("/esqueci-senha")
@@ -194,5 +193,4 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token inválido ou expirado.");
         }
     }
-
 }

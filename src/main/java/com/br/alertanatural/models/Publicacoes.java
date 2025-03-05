@@ -10,47 +10,50 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-@Entity
-@Table(name = "publicacoes")
+@Entity // Marca a classe como uma entidade JPA mapeada para uma tabela no banco de dados
+@Table(name = "publicacoes") // Define o nome da tabela no banco de dados
 public class Publicacoes {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id // Define a chave primária da tabela
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Define a estratégia de geração automática para o ID
     private Long idPublicacao;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT") // Define que a coluna 'texto' será do tipo TEXT no banco de dados
     private String texto;
 
-    private String nomeUsuario;
+    private String nomeUsuario; // Nome do usuário que fez a publicação
 
-    private String fotoUsuario;
+    private String fotoUsuario; // Foto do usuário que fez a publicação
 
-
-
-    @CreationTimestamp
+    @CreationTimestamp // Gera automaticamente a data de criação do registro
     private Date dataCadastro;
 
-    @UpdateTimestamp
+    @UpdateTimestamp // Gera automaticamente a data da última atualização do registro
     private Date dataAtualizacao;
 
-    @ManyToOne
-    @JoinColumn(name = "idusuario", nullable = false)
-    @JsonIgnore
+    @ManyToOne // Define o relacionamento muitos-para-um entre 'Publicacoes' e 'Usuarios'
+    @JoinColumn(name = "idusuario", nullable = false) // Define a coluna de relacionamento e define que não pode ser nula
+    @JsonIgnore // Ignora o campo 'usuario' durante a serialização JSON
     private Usuarios usuario;
 
-    @OneToMany(mappedBy = "publicacao", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @OneToMany(mappedBy = "publicacao", cascade = CascadeType.ALL, orphanRemoval = true) // Relacionamento um-para-muitos com 'Fotos'
+    @JsonManagedReference // Controla a serialização JSON para evitar problemas de recursão
     private List<Fotos> fotos;
 
-    @OneToMany(mappedBy = "publicacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "publicacao", cascade = CascadeType.ALL, orphanRemoval = true) // Relacionamento um-para-muitos com 'Comentario'
     private List<Comentario> comentarios;
 
-    @ElementCollection
+    @ElementCollection // Define um tipo de coleção simples (lista de strings) para vídeos
     private List<String> videos;
 
+    @OneToMany(mappedBy = "publicacao", cascade = CascadeType.ALL, orphanRemoval = true) // Relacionamento um-para-muitos com 'Curtida'
+    private List<Curtida> curtidas;
+
+    // Construtor padrão (sem parâmetros) para a entidade JPA
     public Publicacoes() {
     }
 
+    // Construtor com parâmetros para inicializar a entidade com valores específicos
     public Publicacoes(Long idPublicacao, String texto, String nomeUsuario, String fotoUsuario, List<String> videos, Date dataCadastro, Date dataAtualizacao, Usuarios usuario, List<Fotos> fotos) {
         this.idPublicacao = idPublicacao;
         this.texto = texto;
@@ -63,6 +66,7 @@ public class Publicacoes {
         this.fotos = fotos;
     }
 
+    // Métodos getter e setter para acessar e modificar os valores dos atributos
     public Long getIdPublicacao() {
         return idPublicacao;
     }
@@ -135,6 +139,15 @@ public class Publicacoes {
         this.videos = videos;
     }
 
+    public List<Curtida> getCurtidas() {
+        return curtidas;
+    }
+
+    public void setCurtidas(List<Curtida> curtidas) {
+        this.curtidas = curtidas;
+    }
+
+    // Método toString para exibir uma representação em String do objeto
     @Override
     public String toString() {
         return "Publicacoes{" +
@@ -150,6 +163,7 @@ public class Publicacoes {
                 '}';
     }
 
+    // Método equals para comparar dois objetos da classe 'Publicacoes' com base no id
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -157,6 +171,7 @@ public class Publicacoes {
         return Objects.equals(idPublicacao, that.idPublicacao);
     }
 
+    // Método hashCode para gerar um código hash baseado no id
     @Override
     public int hashCode() {
         return Objects.hashCode(idPublicacao);

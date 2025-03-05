@@ -9,56 +9,57 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-@Entity
-@Table(name = "usuarios")
+@Entity  // Define a classe como uma entidade JPA para persistência no banco de dados
+@Table(name = "usuarios")  // Mapeia a tabela 'usuarios' no banco de dados
 public class Usuarios {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id  // Define o campo 'idusuario' como chave primária
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Gera o valor do ID automaticamente com incremento
     private Long idusuario;
 
-    @NotNull
+    @NotNull  // O campo 'nome' não pode ser nulo
     private String nome;
 
-    private String sobreNome;
+    private String sobreNome;  // Sobrenome do usuário
 
-    @NotNull
+    @NotNull  // O campo 'cpf' não pode ser nulo
     private String cpf;
 
-    @NotNull
+    @NotNull  // O campo 'telefone' não pode ser nulo
     private String telefone;
 
-    @NotNull
+    @NotNull  // O campo 'email' não pode ser nulo
     private String email;
 
-    @NotNull
+    @NotNull  // O campo 'senha' não pode ser nulo
     private String senha;
 
-    private String foto;
+    private String foto;  // Foto do usuário (opcional)
 
-    private String tokenRedefinicaoSenha;
+    private String tokenRedefinicaoSenha;  // Token para redefinição de senha (opcional)
 
-    @CreationTimestamp
+    @CreationTimestamp  // Marca a data e hora de criação do registro automaticamente
     private Date dataCadastro;
 
-    @UpdateTimestamp
+    @UpdateTimestamp  // Marca a data e hora da última atualização automaticamente
     private Date dataAtualizacao;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)  // Relacionamento de um para muitos com 'Fotos', onde o mapeamento é feito pela chave estrangeira 'usuario' na entidade 'Fotos'
     private List<Fotos> fotos;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)  // Relacionamento de um para muitos com 'Publicacoes', onde o mapeamento é feito pela chave estrangeira 'usuario' na entidade 'Publicacoes'
     private List<Publicacoes> publicacoes;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)  // Relacionamento de um para muitos com 'Amigos', onde o mapeamento é feito pela chave estrangeira 'usuario' na entidade 'Amigos'
     private List<Amigos> amigos;
 
-    @OneToMany(mappedBy = "amigo", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "amigo", cascade = CascadeType.ALL, orphanRemoval = true)  // Relacionamento de um para muitos com 'Amigos', onde o mapeamento é feito pela chave estrangeira 'amigo' na entidade 'Amigos'
     private List<Amigos> seguidores;
 
-    public Usuarios() {
+    public Usuarios() {  // Construtor padrão
     }
 
+    // Construtor com parâmetros para inicializar todos os campos
     public Usuarios(Long idusuario, String nome, String sobreNome, String cpf, String telefone, String email, String senha, String foto, Date dataCadastro, Date dataAtualizacao, List<Fotos> fotos, List<Publicacoes> publicacoes, List<Amigos> amigos, List<Amigos> seguidores) {
         this.idusuario = idusuario;
         this.nome = nome;
@@ -75,6 +76,8 @@ public class Usuarios {
         this.amigos = amigos;
         this.seguidores = seguidores;
     }
+
+    // Métodos de acesso (getters e setters) para todos os campos
 
     public Long getIdusuario() {
         return idusuario;
@@ -196,6 +199,7 @@ public class Usuarios {
         this.tokenRedefinicaoSenha = tokenRedefinicaoSenha;
     }
 
+    // Sobrescrita do método toString para retornar uma representação textual do objeto 'Usuarios'
     @Override
     public String toString() {
         return "Usuario{" +
@@ -216,6 +220,7 @@ public class Usuarios {
                 '}';
     }
 
+    // Sobrescrita dos métodos equals e hashCode para comparação e criação do código hash do objeto 'Usuarios'
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

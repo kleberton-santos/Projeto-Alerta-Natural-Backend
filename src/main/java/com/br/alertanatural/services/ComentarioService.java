@@ -20,50 +20,50 @@ public class ComentarioService {
     @Autowired
     private UsuarioService usuarioService;
 
-    // Adicionar um novo comentário
+    // Adiciona um novo comentário a uma publicação específica por um usuário
     public Comentario adicionarComentario(Publicacoes publicacao, Usuarios usuario, String texto) {
-        Comentario comentario = new Comentario();
-        comentario.setPublicacoes(publicacao);
-        comentario.setUsuarios(usuario);
-        comentario.setTexto(texto);
-        return comentarioRepository.save(comentario);
+        Comentario comentario = new Comentario(); // Cria um novo objeto Comentario
+        comentario.setPublicacoes(publicacao); // Associa a publicação ao comentário
+        comentario.setUsuarios(usuario); // Associa o usuário ao comentário
+        comentario.setTexto(texto); // Define o texto do comentário
+        return comentarioRepository.save(comentario); // Salva o comentário no banco de dados
     }
 
-    // Listar comentários de uma publicação
+    // Lista todos os comentários de uma determinada publicação
     public List<ComentarioDTO> listarComentariosPorPublicacao(Publicacoes publicacao) {
-        List<Comentario> comentarios = comentarioRepository.findByPublicacao(publicacao);
-        return comentarios.stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+        List<Comentario> comentarios = comentarioRepository.findByPublicacao(publicacao); // Recupera os comentários da publicação
+        return comentarios.stream() // Converte a lista de Comentario para uma lista de ComentarioDTO
+                .map(this::toDTO) // Mapeia cada Comentario para ComentarioDTO
+                .collect(Collectors.toList()); // Coleta os resultados em uma lista
     }
 
-    // Editar um comentário
+    // Edita um comentário existente
     public Comentario editarComentario(Long idComentario, String novoTexto) {
-        Comentario comentario = comentarioRepository.findById(idComentario)
-                .orElseThrow(() -> new RuntimeException("Comentário não encontrado"));
-        comentario.setTexto(novoTexto);
-        return comentarioRepository.save(comentario);
+        Comentario comentario = comentarioRepository.findById(idComentario) // Busca o comentário pelo ID
+                .orElseThrow(() -> new RuntimeException("Comentário não encontrado")); // Lança exceção caso o comentário não exista
+        comentario.setTexto(novoTexto); // Atualiza o texto do comentário
+        return comentarioRepository.save(comentario); // Salva as alterações no banco de dados
     }
 
-    // Remover um comentário
+    // Deleta um comentário pelo ID
     public void deletarComentario(Long idComentario) {
-        comentarioRepository.deleteById(idComentario);
+        comentarioRepository.deleteById(idComentario); // Deleta o comentário com o ID fornecido
     }
 
+    // Busca um comentário específico pelo ID
     public Comentario buscarComentarioPorId(Long idComentario) {
-        return comentarioRepository.findById(idComentario)
-                .orElseThrow(() -> new RuntimeException("Comentário não encontrado"));
+        return comentarioRepository.findById(idComentario) // Busca o comentário pelo ID
+                .orElseThrow(() -> new RuntimeException("Comentário não encontrado")); // Lança exceção caso o comentário não exista
     }
 
-    // Converter Comentario para ComentarioDTO
+    // Converte um objeto Comentario para um objeto ComentarioDTO
     public ComentarioDTO toDTO(Comentario comentario) {
-        ComentarioDTO dto = new ComentarioDTO();
-        dto.setId(comentario.getId());
-        dto.setTexto(comentario.getTexto());
-        dto.setDataCadastro(comentario.getDataCadastro());
-        dto.setIdUsuario(comentario.getUsuarios().getIdusuario());
-        dto.setNomeUsuario(comentario.getUsuarios().getNome());
-        return dto;
+        ComentarioDTO dto = new ComentarioDTO(); // Cria uma instância de ComentarioDTO
+        dto.setId(comentario.getId()); // Define o ID do comentário
+        dto.setTexto(comentario.getTexto()); // Define o texto do comentário
+        dto.setDataCadastro(comentario.getDataCadastro()); // Define a data de cadastro do comentário
+        dto.setIdUsuario(comentario.getUsuarios().getIdusuario()); // Define o ID do usuário que fez o comentário
+        dto.setNomeUsuario(comentario.getUsuarios().getNome()); // Define o nome do usuário que fez o comentário
+        return dto; // Retorna o objeto ComentarioDTO
     }
 }
-

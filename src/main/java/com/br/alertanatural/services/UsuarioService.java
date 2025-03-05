@@ -23,101 +23,110 @@ import java.util.stream.Collectors;
 public class UsuarioService {
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private UsuarioRepository usuarioRepository; // Repositório para interagir com o banco de dados de usuários
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder; // Para criptografar as senhas dos usuários
 
-    private static final String UPLOAD_DIR = "C:\\foto-alerta";
+    private static final String UPLOAD_DIR = "C:\\foto-alerta"; // Diretório para salvar fotos dos usuários
 
     static {
+        // Criação do diretório para salvar as fotos, caso não exista
         File diretorio = new File(UPLOAD_DIR);
         if (!diretorio.exists()) {
             diretorio.mkdirs();
         }
     }
 
+    // Cria um novo usuário
     public Usuarios criarUsuario(Usuarios usuario) {
         // Verifica se a senha foi fornecida
         if (usuario.getSenha() != null) {
-            // Criptografar a senha antes de salvar no banco
+            // Criptografa a senha antes de salvar no banco
             usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
         } else {
             // Define uma senha padrão para usuários OAuth2 (opcional)
-            usuario.setSenha("OAUTH2_USER"); // Você pode usar um valor fixo ou gerar um UUID
+            usuario.setSenha("OAUTH2_USER"); // Usado para autenticação externa
         }
 
+        // Salva o usuário no banco de dados
         return usuarioRepository.save(usuario);
     }
 
-    public List<Usuarios> listarUsuarios(){
+    // Lista todos os usuários
+    public List<Usuarios> listarUsuarios() {
         return usuarioRepository.findAll();
     }
 
-    public Optional<Usuarios> listarUsuariosPorId(Long id){
+    // Lista um usuário pelo ID
+    public Optional<Usuarios> listarUsuariosPorId(Long id) {
         return usuarioRepository.findById(id);
     }
 
-
-    public void deletarUsuario(Long id){
-         usuarioRepository.deleteById(id);
+    // Deleta um usuário pelo ID
+    public void deletarUsuario(Long id) {
+        usuarioRepository.deleteById(id);
     }
 
+    // Busca um usuário pelo email
     public Optional<Usuarios> listarUsuariosPorEmail(String email) {
         return usuarioRepository.findByEmail(email);
     }
 
+    // Edita os dados de um usuário, incluindo foto
     public Usuarios editarUsuario(Long id, Usuarios usuarioAtualizado, MultipartFile foto) throws IOException {
+        // Verifica se o usuário existe no banco
         return usuarioRepository.findById(id)
                 .map(usuario -> {
+                    // Atualiza os campos do usuário
                     usuario.setNome(usuarioAtualizado.getNome());
                     usuario.setSobreNome(usuarioAtualizado.getSobreNome());
                     usuario.setCpf(usuarioAtualizado.getCpf());
                     usuario.setTelefone(usuarioAtualizado.getTelefone());
                     usuario.setEmail(usuarioAtualizado.getEmail());
 
-                    // Verifique se a senha foi passada no corpo da requisição
+                    // Verifica se a senha foi passada e a criptografa
                     if (usuarioAtualizado.getSenha() != null) {
-                        usuario.setSenha(passwordEncoder.encode(usuarioAtualizado.getSenha())); // Recriptografar senha
+                        usuario.setSenha(passwordEncoder.encode(usuarioAtualizado.getSenha())); // Recriptografa a senha
                     }
 
-                    // Salvar a foto, se fornecida
+                    // Se houver foto fornecida, salva-a
                     if (foto != null && !foto.isEmpty()) {
-                        String fotoUrl = null; // Salva a foto no diretório
+                        String fotoUrl = null;
                         try {
-                            fotoUrl = salvarFoto(foto);
+                            fotoUrl = salvarFoto(foto); // Chama o método para salvar a foto
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
                         usuario.setFoto(fotoUrl); // Atualiza o caminho da foto no banco de dados
                     }
 
+                    // Salva as alterações no banco de dados
                     return usuarioRepository.save(usuario);
                 })
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado")); // Se o usuário não for encontrado, lança exceção
     }
 
+    // Método para salvar a foto no diretório e retornar o caminho do arquivo
     private String salvarFoto(MultipartFile foto) throws IOException {
-        // Geração de nome único para a foto
+        // Gera um nome único para a foto, baseado no timestamp atual
         String nomeArquivo = System.currentTimeMillis() + "_" + foto.getOriginalFilename();
         Path caminhoDestino = Paths.get(UPLOAD_DIR, nomeArquivo);
 
         // Salva o arquivo no diretório especificado
-        Files.copy(foto.getInputStream(), caminhoDestino);
+        Files.copy(foto.getInputStream(), caminhoDestino, StandardCopyOption.REPLACE_EXISTING);
 
-        // Retorna o caminho da foto salva
+        // Retorna o nome do arquivo salvo (caminho relativo)
         return nomeArquivo;
     }
 
+    // Lista os usuários cujo nome contenha o termo pesquisado
     public List<Usuarios> listarUsuariosPorNome(String nome) {
-        return usuarioRepository.findByNomeContainingIgnoreCase(nome);
+        return usuarioRepository.findByNomeContainingIgnoreCase(nome); // Busca por nome, ignorando maiúsculas/minúsculas
     }
 
+    // Atualiza as informações de um usuário
     public Usuarios atualizarUsuario(Usuarios usuario) {
         return usuarioRepository.save(usuario);
     }
-
-
 }
-
-
