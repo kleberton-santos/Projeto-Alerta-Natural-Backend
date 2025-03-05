@@ -1,10 +1,15 @@
 package com.br.alertanatural.controllers;
 
+import com.br.alertanatural.DTOs.ComentarioDTO;
 import com.br.alertanatural.DTOs.PublicacaoDTO;
+import com.br.alertanatural.models.Comentario;
 import com.br.alertanatural.models.Fotos;
 import com.br.alertanatural.models.Publicacoes;
+import com.br.alertanatural.models.Usuarios;
 import com.br.alertanatural.repositories.PublicacaoRepository;
+import com.br.alertanatural.services.ComentarioService;
 import com.br.alertanatural.services.PublicacoesService;
+import com.br.alertanatural.services.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +29,12 @@ public class PublicacoesController {
 
     @Autowired
     private PublicacoesService publicacoesService;
+
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private ComentarioService comentarioService;
 
     @Operation(summary = "Criar uma nova publicação", description = "Cria uma nova publicação com o texto fornecido")
     @PostMapping
@@ -116,6 +127,68 @@ public class PublicacoesController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         publicacoesService.deletarPublicacaoPorUsuario(idUsuario, idPublicacao);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    // Adicionar um comentário a uma publicação
+    @PostMapping("/{idPublicacao}/comentarios")
+    public ResponseEntity<ComentarioDTO> adicionarComentario(
+            @PathVariable Long idPublicacao,
+            @RequestParam Long idUsuario,
+            @RequestParam String texto) {
+
+        Publicacoes publicacao = publicacoesService.buscarPublicacaoPorId(idPublicacao);
+        Usuarios usuario = usuarioService.listarUsuariosPorId(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        Comentario comentario = comentarioService.adicionarComentario(publicacao, usuario, texto);
+        ComentarioDTO comentarioDTO = comentarioService.toDTO(comentario);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(comentarioDTO);
+    }
+
+    // Listar comentários de uma publicação
+    @GetMapping("/{idPublicacao}/comentarios")
+    public ResponseEntity<List<ComentarioDTO>> listarComentarios(@PathVariable Long idPublicacao) {
+        Publicacoes publicacao = publicacoesService.buscarPublicacaoPorId(idPublicacao);
+        List<ComentarioDTO> comentariosDTO = comentarioService.listarComentariosPorPublicacao(publicacao);
+        return ResponseEntity.ok(comentariosDTO);
+    }
+
+    // Editar um comentário
+    @PutMapping("/{idPublicacao}/comentarios/{idComentario}")
+    public ResponseEntity<ComentarioDTO> editarComentario(
+            @PathVariable Long idPublicacao,
+            @PathVariable Long idComentario,
+            @RequestParam String novoTexto,
+            @RequestParam Long idUsuario) {
+
+        // Verifica se o comentário pertence ao usuário
+        Comentario comentario = comentarioService.buscarComentarioPorId(idComentario);
+        if (!comentario.getUsuarios().getIdusuario().equals(idUsuario)) {
+            throw new RuntimeException("Usuário não tem permissão para editar este comentário");
+        }
+
+        Comentario comentarioAtualizado = comentarioService.editarComentario(idComentario, novoTexto);
+        ComentarioDTO comentarioDTO = comentarioService.toDTO(comentarioAtualizado);
+
+        return ResponseEntity.ok(comentarioDTO);
+    }
+
+    // Remover um comentário
+    @DeleteMapping("/{idPublicacao}/comentarios/{idComentario}")
+    public ResponseEntity<Void> removerComentario(
+            @PathVariable Long idPublicacao,
+            @PathVariable Long idComentario,
+            @RequestParam Long idUsuario) {
+
+        // Verifica se o comentário pertence ao usuário
+        Comentario comentario = comentarioService.buscarComentarioPorId(idComentario);
+        if (!comentario.getUsuarios().getIdusuario().equals(idUsuario)) {
+            throw new RuntimeException("Usuário não tem permissão para remover este comentário");
+        }
+
+        comentarioService.deletarComentario(idComentario);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

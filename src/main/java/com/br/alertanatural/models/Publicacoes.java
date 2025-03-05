@@ -42,6 +42,9 @@ public class Publicacoes {
     @JsonManagedReference
     private List<Fotos> fotos;
 
+    @OneToMany(mappedBy = "publicacao", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comentario> comentarios;
+
     @ElementCollection
     private List<String> videos;
 
