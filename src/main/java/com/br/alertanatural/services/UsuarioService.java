@@ -1,6 +1,7 @@
 package com.br.alertanatural.services;
 
 import com.br.alertanatural.DTOs.LoginDTO;
+import com.br.alertanatural.DTOs.UsuarioDTO;
 import com.br.alertanatural.models.Usuarios;
 import com.br.alertanatural.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,5 +129,26 @@ public class UsuarioService {
     // Atualiza as informações de um usuário
     public Usuarios atualizarUsuario(Usuarios usuario) {
         return usuarioRepository.save(usuario);
+    }
+
+    // Método para buscar um usuário por ID e retornar como DTO
+    public Optional<UsuarioDTO> listarUsuariosPorIdDTO(Long id) {
+        return usuarioRepository.findById(id)
+                .map(this::toDTO); // Usa o método toDTO para converter
+    }
+
+    // Método privado para converter Usuarios em UsuarioDTO
+    private UsuarioDTO toDTO(Usuarios usuario) {
+        UsuarioDTO dto = new UsuarioDTO();
+        dto.setIdusuario(usuario.getIdusuario());
+        dto.setNome(usuario.getNome());
+        dto.setSobreNome(usuario.getSobreNome());
+        dto.setCpf(usuario.getCpf());
+        dto.setTelefone(usuario.getTelefone());
+        dto.setEmail(usuario.getEmail());
+        dto.setFoto(usuario.getFoto());
+        dto.setDataCadastro(usuario.getDataCadastro());
+        dto.setDataAtualizacao(usuario.getDataAtualizacao());
+        return dto;
     }
 }

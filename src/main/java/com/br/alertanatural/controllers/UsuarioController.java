@@ -1,6 +1,7 @@
 package com.br.alertanatural.controllers;
 
 import com.br.alertanatural.DTOs.FotosDTO;
+import com.br.alertanatural.DTOs.UsuarioDTO;
 import com.br.alertanatural.models.Usuarios;
 import com.br.alertanatural.services.FotoService;
 import com.br.alertanatural.services.UsuarioService;
@@ -49,14 +50,12 @@ public class UsuarioController {
     // Endpoint para buscar um usuário por ID
     @Operation(summary = "Buscar usuário por ID", description = "Retorna o usuário correspondente ao ID fornecido")
     @GetMapping("/{id}")
-    public ResponseEntity<Usuarios> listarUsuariosId(@PathVariable Long id) {
-        // Tenta encontrar o usuário pelo ID, se encontrado, retorna os dados
-        Optional<Usuarios> usuario = usuarioService.listarUsuariosPorId(id);
+    public ResponseEntity<UsuarioDTO> listarUsuariosId(@PathVariable Long id) {
+        Optional<UsuarioDTO> dto = usuarioService.listarUsuariosPorIdDTO(id);
 
-        if (usuario.isPresent()) {
-            return ResponseEntity.status(HttpStatus.OK).body(usuario.get());
+        if (dto.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK).body(dto.get());
         } else {
-            // Caso o usuário não seja encontrado, retorna 404 (NOT_FOUND)
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
