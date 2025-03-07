@@ -11,10 +11,15 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/fotos") // Mapeia os endpoints para fotos
@@ -67,6 +72,44 @@ public class FotoController {
             }
         } catch (Exception e) {
             throw new RuntimeException("Erro ao carregar a imagem padrão", e); // Lança erro em caso de falha ao carregar a imagem
+        }
+    }
+
+    // Endpoint para fazer upload de vídeos
+    @Operation(summary = "Fazer upload de vídeo", description = "Faz o upload de um vídeo para o servidor")
+    @PostMapping("/upload-video")
+    public ResponseEntity<String> uploadVideo(@RequestParam("file") MultipartFile file) {
+        try {
+            Path uploadPath = Paths.get("C:/foto-alerta");
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Files.copy(file.getInputStream(), uploadPath.resolve(fileName));
+
+            return ResponseEntity.ok(fileName);
+        } catch (IOException e) {
+            throw new RuntimeException("Falha ao salvar o vídeo: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Obter vídeo", description = "Retorna um vídeo pelo nome do arquivo")
+    @GetMapping("/video/{filename}")
+    public ResponseEntity<Resource> getVideo(@PathVariable String filename) {
+        try {
+            Path videoPath = Paths.get("C:/foto-alerta").resolve(filename);
+            Resource resource = new UrlResource(videoPath.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType("video/mp4")) // Define o tipo de conteúdo como video/mp4
+                        .body(resource);
+            } else {
+                throw new RuntimeException("Vídeo não encontrado: " + filename);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao carregar o vídeo: " + e.getMessage());
         }
     }
 }
