@@ -121,7 +121,7 @@ spring.mail.properties.mail.smtp.starttls.enable=true
 
 Este projeto está licenciado sob a MIT License 
 ---
-### 📌 Desenvolvido por Kleberton Santos, Dislene Portela, Julio, Leon e Marcelo.
+#### 📌 Desenvolvido por Kleberton Santos, Dislene Portela, Julio, Leon e Marcelo.
 ---
 ### 🌟 Contribuições são bem-vindas!
 #### Se você quiser contribuir para o projeto, sinta-se à vontade para abrir uma issue ou enviar um pull request.
